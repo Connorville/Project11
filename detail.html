@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detail Alat | MediTrackPRO</title>
+
+    <link rel="stylesheet" href="detail.css">
+</head>
+<body>
+
+    <div class="app-layout">
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar" id="sidebar">
+
+            <div class="sidebar-header">
+                <div class="logo-icon">M</div>
+                <div>
+                    <h2>MediTrack<span>PRO</span></h2>
+                    <small>Medical Equipment</small>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+
+                <p class="nav-label">MENU UTAMA</p>
+
+                <a href="dashboard.html" class="nav-item">
+                    <span>▦</span>
+                    Dashboard
+                </a>
+
+                <a href="equipment.html" class="nav-item active">
+                    <span>▣</span>
+                    Daftar Alat
+                </a>
+
+                <a href="#" class="nav-item" id="maintenanceLink">
+                    <span>⚙</span>
+                    Maintenance
+                </a>
+
+                <a href="#" class="nav-item" id="simulationLink">
+                    <span>▶</span>
+                    Simulasi
+                </a>
+
+                <p class="nav-label">LAINNYA</p>
+
+                <a href="#" class="nav-item" id="settingsLink">
+                    <span>⚙</span>
+                    Pengaturan
+                </a>
+
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-avatar">A</div>
+                <div>
+                    <strong>Administrator</strong>
+                    <small>Monitoring Staff</small>
+                </div>
+            </div>
+
+        </aside>
+
+
+        <!-- MAIN CONTENT -->
+        <main class="main-content">
+
+            <!-- TOPBAR -->
+            <header class="topbar">
+
+                <button class="menu-button" id="menuButton">
+                    ☰
+                </button>
+
+                <div class="page-title">
+                    <span>Detail Alat</span>
+                    <small>Informasi lengkap perangkat medis</small>
+                </div>
+
+                <div class="topbar-right">
+                    <div class="notification">
+                        🔔
+                        <span class="notification-dot"></span>
+                    </div>
+
+                    <div class="top-avatar">A</div>
+                </div>
+
+            </header>
+
+
+            <!-- CONTENT -->
+            <section class="content">
+
+                <!-- BREADCRUMB -->
+                <div class="breadcrumb">
+                    <a href="equipment.html">Daftar Alat</a>
+                    <span>/</span>
+                    <span id="breadcrumbName">Detail Alat</span>
+                </div>
+
+
+                <!-- EQUIPMENT HEADER -->
+                <div class="equipment-header-card">
+
+                    <div class="equipment-main-info">
+
+                        <div class="equipment-icon">
+                            🩺
+                        </div>
+
+                        <div>
+                            <p class="equipment-category" id="equipmentType">
+                                Diagnostik
+                            </p>
+
+                            <h1 id="equipmentName">
+                                Patient Monitor
+                            </h1>
+
+                            <p class="equipment-id" id="equipmentId">
+                                MD-2026-001
+                            </p>
+                        </div>
+
+                    </div>
+
+                    <div class="header-actions">
+
+                        <span class="status-badge" id="equipmentStatus">
+                            Baik
+                        </span>
+
+                        <button class="btn btn-secondary" id="backButton">
+                            ← Kembali
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <!-- STAT CARDS -->
+                <div class="stats-grid">
+
+                    <div class="stat-card">
+                        <div class="stat-icon score-icon">✓</div>
+                        <div>
+                            <span>Kondisi</span>
+                            <strong id="scoreValue">94%</strong>
+                            <small>Equipment Score</small>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon battery-icon">▰</div>
+                        <div>
+                            <span>Baterai</span>
+                            <strong id="batteryValue">87%</strong>
+                            <small>Kapasitas tersisa</small>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon usage-icon">◷</div>
+                        <div>
+                            <span>Penggunaan</span>
+                            <strong id="usageValue">128 jam</strong>
+                            <small>Total penggunaan</small>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon calibration-icon">⚙</div>
+                        <div>
+                            <span>Kalibrasi</span>
+                            <strong id="calibrationValue">12 hari</strong>
+                            <small>Sampai pemeriksaan</small>
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <!-- MAIN GRID -->
+                <div class="detail-grid">
+
+                    <!-- CONDITION -->
+                    <div class="card condition-card">
+
+                        <div class="card-header">
+                            <div>
+                                <h2>Kondisi Alat</h2>
+                                <p>Status kondisi perangkat saat ini</p>
+                            </div>
+                        </div>
+
+                        <div class="condition-score">
+
+                            <div class="score-circle" id="scoreCircle">
+                                <strong id="circleScore">94</strong>
+                                <span>/ 100</span>
+                            </div>
+
+                            <div class="condition-description">
+
+                                <h3 id="conditionTitle">
+                                    Kondisi Baik
+                                </h3>
+
+                                <p id="conditionDescription">
+                                    Alat dalam kondisi baik dan dapat digunakan.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                        <div class="progress-section">
+
+                            <div class="progress-label">
+                                <span>Equipment Score</span>
+                                <strong id="scorePercent">94%</strong>
+                            </div>
+
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="scoreProgress"></div>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- INFORMATION -->
+                    <div class="card">
+
+                        <div class="card-header">
+                            <div>
+                                <h2>Informasi Alat</h2>
+                                <p>Data identitas perangkat</p>
+                            </div>
+                        </div>
+
+                        <div class="info-list">
+
+                            <div class="info-row">
+                                <span>Nama Alat</span>
+                                <strong id="infoName">Patient Monitor</strong>
+                            </div>
+
+                            <div class="info-row">
+                                <span>ID Alat</span>
+                                <strong id="infoId">MD-2026-001</strong>
+                            </div>
+
+                            <div class="info-row">
+                                <span>Kategori</span>
+                                <strong id="infoCategory">Diagnostik</strong>
+                            </div>
+
+                            <div class="info-row">
+                                <span>Status</span>
+                                <strong id="infoStatus">Baik</strong>
+                            </div>
+
+                            <div class="info-row">
+                                <span>Total Penggunaan</span>
+                                <strong id="infoUsage">128 jam</strong>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- MAINTENANCE -->
+                    <div class="card">
+
+                        <div class="card-header">
+                            <div>
+                                <h2>Maintenance</h2>
+                                <p>Informasi pemeriksaan alat</p>
+                            </div>
+                        </div>
+
+                        <div class="maintenance-box">
+
+                            <div class="maintenance-icon">
+                                ⚙
+                            </div>
+
+                            <div>
+                                <span>Jadwal pemeriksaan berikutnya</span>
+                                <strong id="maintenanceDate">
+                                    16 September 2026
+                                </strong>
+                                <small id="maintenanceText">
+                                    12 hari lagi
+                                </small>
+                            </div>
+
+                        </div>
+
+                        <button class="btn btn-primary full-width" id="maintenanceButton">
+                            Lihat Maintenance
+                        </button>
+
+                    </div>
+
+
+                    <!-- RECENT ACTIVITY -->
+                    <div class="card">
+
+                        <div class="card-header">
+                            <div>
+                                <h2>Aktivitas Terbaru</h2>
+                                <p>Riwayat penggunaan alat</p>
+                            </div>
+                        </div>
+
+                        <div class="activity-list">
+
+                            <div class="activity-item">
+                                <div class="activity-dot"></div>
+
+                                <div>
+                                    <strong>Alat digunakan</strong>
+                                    <span>Ruang ICU</span>
+                                    <small>Hari ini, 09:30</small>
+                                </div>
+                            </div>
+
+                            <div class="activity-item">
+                                <div class="activity-dot"></div>
+
+                                <div>
+                                    <strong>Pemeriksaan kondisi</strong>
+                                    <span>Hasil: Normal</span>
+                                    <small>Kemarin, 14:20</small>
+                                </div>
+                            </div>
+
+                            <div class="activity-item">
+                                <div class="activity-dot"></div>
+
+                                <div>
+                                    <strong>Data diperbarui</strong>
+                                    <span>Administrator</span>
+                                    <small>2 hari lalu</small>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ACTION -->
+                <div class="action-card">
+
+                    <div>
+                        <h2>Simulasi Penggunaan</h2>
+                        <p>
+                            Jalankan simulasi untuk melihat bagaimana alat
+                            digunakan dan dipantau oleh MediTrackPRO.
+                        </p>
+                    </div>
+
+                    <button class="btn btn-primary" id="simulationButton">
+                        ▶ Mulai Simulasi
+                    </button>
+
+                </div>
+
+            </section>
+
+        </main>
+
+    </div>
+
+    <script src="detail.js"></script>
+
+</body>
+</html>

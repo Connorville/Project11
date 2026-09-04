@@ -300,32 +300,9 @@ searchInput.addEventListener("input", function () {
 // DETAIL ALAT
 // ========================================
 
-function viewEquipment(id) {
-
-    const item = equipment.find(
-        equipmentItem => equipmentItem.id === id
-    );
-
-
-    if (!item) {
-        return;
-    }
-
-
-    alert(
-        `Detail Alat\n\n` +
-
-        `ID: ${item.id}\n` +
-        `Nama: ${item.name}\n` +
-        `Jenis: ${item.type}\n` +
-        `Penggunaan: ${item.usage} kali\n` +
-        `Baterai: ${item.battery}%\n` +
-        `Kalibrasi: ${item.calibration} hari lagi\n` +
-        `Skor Kondisi: ${item.score}\n` +
-        `Status: ${item.status}`
-    );
+function showDetail(Id) {
+    window.location.href = `detail.html?id=${Id}`;
 }
-
 
 // ========================================
 // TAMBAH ALAT

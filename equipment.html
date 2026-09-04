@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>MediTrackPRO | Daftar Alat</title>
+
+    <link rel="stylesheet" href="equipment.css">
+
+    <!-- Google Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+    <!-- ================= SIDEBAR ================= -->
+    <aside class="sidebar" id="sidebar">
+
+        <div class="sidebar-logo">
+            <div class="logo-icon">+</div>
+            <div>
+                <strong>MediTrack<span>PRO</span></strong>
+                <small>Medical Equipment</small>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+
+            <div class="nav-section">
+                <span class="nav-title">MENU UTAMA</span>
+
+                <a href="dashboard.html" class="nav-item">
+                    <span class="nav-icon">▦</span>
+                    <span>Dashboard</span>
+                </a>
+
+                <a href="equipment.html" class="nav-item active">
+                    <span class="nav-icon">▣</span>
+                    <span>Daftar Alat</span>
+                </a>
+
+                <a href="#" class="nav-item" id="maintenanceLink">
+                    <span class="nav-icon">🔧</span>
+                    <span>Maintenance</span>
+                </a>
+
+                <a href="#" class="nav-item" id="simulationLink">
+                    <span class="nav-icon">⚡</span>
+                    <span>Simulasi</span>
+                </a>
+            </div>
+
+            <div class="nav-section">
+                <span class="nav-title">LAINNYA</span>
+
+                <a href="#" class="nav-item" id="settingsLink">
+                    <span class="nav-icon">⚙</span>
+                    <span>Pengaturan</span>
+                </a>
+            </div>
+
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="system-status">
+                <span class="status-dot"></span>
+                <div>
+                    <strong>System Active</strong>
+                    <small>Prototype Mode</small>
+                </div>
+            </div>
+        </div>
+
+    </aside>
+
+
+    <!-- ================= MAIN ================= -->
+    <main class="main-content">
+
+        <!-- TOPBAR -->
+        <header class="topbar">
+
+            <button class="mobile-menu" id="mobileMenu">
+                ☰
+            </button>
+
+            <div class="page-heading">
+                <span class="breadcrumb">MediTrackPRO / Equipment</span>
+                <h1>Daftar Alat</h1>
+                <p>Kelola dan pantau seluruh alat medis yang terdaftar.</p>
+            </div>
+
+            <div class="topbar-actions">
+
+                <div class="notification">
+                    <span>🔔</span>
+                    <i></i>
+                </div>
+
+                <div class="profile">
+                    <div class="profile-avatar">A</div>
+
+                    <div class="profile-info">
+                        <strong>Administrator</strong>
+                        <small>Medical Staff</small>
+                    </div>
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- ================= CONTENT ================= -->
+        <section class="content">
+
+            <!-- TOOLBAR -->
+            <div class="equipment-toolbar">
+
+                <div class="search-box">
+                    <span>⌕</span>
+                    <input
+                        type="text"
+                        id="searchInput"
+                        placeholder="Cari nama alat atau ID..."
+                    >
+                </div>
+
+                <div class="filter-group">
+
+                    <select id="categoryFilter">
+                        <option value="all">Semua Kategori</option>
+                        <option value="Diagnostik">Diagnostik</option>
+                        <option value="Pendukung Kehidupan">
+                            Pendukung Kehidupan
+                        </option>
+                    </select>
+
+                    <select id="statusFilter">
+                        <option value="all">Semua Kondisi</option>
+                        <option value="Baik">Baik</option>
+                        <option value="Perlu Periksa">Perlu Periksa</option>
+                        <option value="Kritis">Kritis</option>
+                    </select>
+
+                </div>
+
+                <button class="add-button" id="addEquipment">
+                    <span>+</span>
+                    Tambah Alat
+                </button>
+
+            </div>
+
+
+            <!-- SUMMARY -->
+            <div class="summary-grid">
+
+                <div class="summary-card">
+                    <div class="summary-icon blue">▣</div>
+                    <div>
+                        <span>Total Alat</span>
+                        <strong id="totalEquipment">0</strong>
+                    </div>
+                </div>
+
+                <div class="summary-card">
+                    <div class="summary-icon green">✓</div>
+                    <div>
+                        <span>Kondisi Baik</span>
+                        <strong id="goodEquipment">0</strong>
+                    </div>
+                </div>
+
+                <div class="summary-card">
+                    <div class="summary-icon orange">!</div>
+                    <div>
+                        <span>Perlu Periksa</span>
+                        <strong id="checkEquipment">0</strong>
+                    </div>
+                </div>
+
+                <div class="summary-card">
+                    <div class="summary-icon red">×</div>
+                    <div>
+                        <span>Kritis</span>
+                        <strong id="criticalEquipment">0</strong>
+                    </div>
+                </div>
+
+            </div>
+
+
+            <!-- TABLE CARD -->
+            <div class="equipment-container">
+
+                <div class="container-header">
+
+                    <div>
+                        <h2>Equipment Overview</h2>
+                        <p>Daftar alat medis yang sedang dipantau.</p>
+                    </div>
+
+                    <span class="equipment-count" id="equipmentCount">
+                        0 alat
+                    </span>
+
+                </div>
+
+
+                <div class="table-wrapper">
+
+                    <table>
+
+                        <thead>
+                            <tr>
+                                <th>ALAT MEDIS</th>
+                                <th>KATEGORI</th>
+                                <th>PENGGUNAAN</th>
+                                <th>BATERAI</th>
+                                <th>KALIBRASI</th>
+                                <th>KONDISI</th>
+                                <th>AKSI</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="equipmentTable">
+                            <!-- Data dari JavaScript -->
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+
+                <!-- EMPTY STATE -->
+                <div class="empty-state" id="emptyState">
+
+                    <div class="empty-icon">⌕</div>
+
+                    <h3>Alat tidak ditemukan</h3>
+
+                    <p>
+                        Tidak ada alat yang sesuai dengan pencarian
+                        atau filter yang dipilih.
+                    </p>
+
+                    <button id="resetFilter">
+                        Reset Filter
+                    </button>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <script src="equipment.js"></script>
+
+</body>
+</html>
