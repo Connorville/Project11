@@ -91,5 +91,37 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     };
 
+    // Sync profil otomatis dari localStorage
+    function syncSidebarProfile() {
+        const savedProfile = localStorage.getItem("mediTrack_profile");
+        if (!savedProfile) return;
+
+        try {
+            const profile = JSON.parse(savedProfile);
+            const sidebarName = document.getElementById("sidebarName");
+            const sidebarRole = document.getElementById("sidebarRole");
+            const sidebarAvatar = document.getElementById("sidebarAvatar");
+            const topAvatar = document.getElementById("topAvatar");
+
+            if (sidebarName && profile.name) sidebarName.textContent = profile.name;
+            if (sidebarRole && profile.role) sidebarRole.textContent = profile.role;
+
+            if (profile.name) {
+                const initial = profile.name.trim().charAt(0).toUpperCase();
+                if (sidebarAvatar) sidebarAvatar.textContent = initial;
+                if (topAvatar) topAvatar.textContent = initial;
+            }
+        } catch (e) {
+            console.error("Gagal memuat profil:", e);
+        }
+    }
+
+    // Pastikan dipanggil DI DALAM event DOMContentLoaded:
+    document.addEventListener("DOMContentLoaded", () => {
+    syncSidebarProfile(); // <-- Panggil di baris pertama
+    
+    // ... kode halaman lainnya ...
+    });
+
     renderDashboard();
 });

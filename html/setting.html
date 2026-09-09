@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pengaturan | MediTrackPRO</title>
+    <link rel="stylesheet" href="../css/global.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div class="app-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-icon">M</div>
+            <div>
+                <h2>MediTrack<span>PRO</span></h2>
+                <small>Medical Equipment</small>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <p class="nav-label">MENU UTAMA</p>
+            <a href="dashboard.html" class="nav-item"><span>▦</span> Dashboard</a>
+            <a href="equipment.html" class="nav-item"><span>▣</span> Daftar Alat</a>
+            <a href="maintenance.html" class="nav-item"><span>⚙</span> Maintenance</a>
+
+            <p class="nav-label">LAINNYA</p>
+            <a href="setting.html" class="nav-item active"><span>⚙</span> Pengaturan</a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="user-avatar" id="sidebarAvatar">A</div>
+            <div>
+                <strong id="sidebarName">Administrator</strong>
+                <small id="sidebarRole">Monitoring Staff</small>
+            </div>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+
+        <!-- TOPBAR -->
+        <header class="topbar">
+            <button class="menu-button" id="menuButton">☰</button>
+            <div class="page-title">
+                <span>Pengaturan Sistem</span>
+                <small>Kelola profil akun dan konfigurasi pemberitahuan</small>
+            </div>
+            <div class="topbar-right">
+                <div class="notification">🔔<span class="notification-dot"></span></div>
+                <div class="top-avatar" id="topAvatar">A</div>
+            </div>
+        </header>
+
+        <!-- CONTENT -->
+        <section class="content">
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px;">
+
+                <!-- FITUR 1: PROFIL & AKUN PENGGUNA -->
+                <div class="card" style="padding: 24px;">
+                    <h3 style="font-size: 16px; margin-bottom: 20px; border-bottom: 1px solid var(--border-color, #e2e8f0); padding-bottom: 12px;">
+                        👤 Profil & Akun Pengguna
+                    </h3>
+                    <form id="profileForm">
+                        <div class="form-group">
+                            <label for="userName">Nama Lengkap</label>
+                            <input type="text" id="userName" value="Administrator" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="userRole">Peran / Jabatan</label>
+                            <input type="text" id="userRole" value="Monitoring Staff" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="userEmail">Email Perusahaan</label>
+                            <input type="email" id="userEmail" value="admin@meditrack.id" required>
+                        </div>
+                        <hr style="border: none; border-top: 1px dashed var(--border-color, #e2e8f0); margin: 20px 0;">
+                        <div class="form-group">
+                            <label for="newPassword">Ubah Kata Sandi Baru</label>
+                            <input type="password" id="newPassword" placeholder="Biarkan kosong jika tidak diubah">
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 12px;">
+                            Simpan Perubahan Profil
+                        </button>
+                    </form>
+                </div>
+
+                <!-- FITUR 2: KONFIGURASI NOTIFIKASI -->
+                <div class="card" style="padding: 24px;">
+                    <h3 style="font-size: 16px; margin-bottom: 20px; border-bottom: 1px solid var(--border-color, #e2e8f0); padding-bottom: 12px;">
+                        🔔 Konfigurasi Notifikasi
+                    </h3>
+                    <form id="notificationForm">
+                        <div class="form-group">
+                            <label for="alertThreshold">Kirim Peringatan Jika Status Alat:</label>
+                            <select id="alertThreshold">
+                                <option value="Rusak">Hanya Status Rusak (Kritis)</option>
+                                <option value="Perlu Perbaikan">Status Perlu Perbaikan & Rusak</option>
+                                <option value="Semua">Semua Perubahan Status Alat</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group" style="margin-top: 16px;">
+                            <label style="margin-bottom: 10px; display: block;">Saluran Notifikasi Aktif:</label>
+                            
+                            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 14px; font-weight: normal; margin-bottom: 8px;">
+                                <input type="checkbox" id="notifyInApp" checked style="width: auto;">
+                                Notifikasi In-App (System Bell)
+                            </label>
+
+                            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 14px; font-weight: normal; margin-bottom: 8px;">
+                                <input type="checkbox" id="notifyEmail" checked style="width: auto;">
+                                Pemberitahuan via Email
+                            </label>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 36px;">
+                            Simpan Pengaturan Notifikasi
+                        </button>
+                    </form>
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+<script src="../js/setting.js"></script>
+</body>
+</html>

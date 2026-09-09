@@ -1,13 +1,12 @@
 // Data Mock Bawaan
 const mockEquipmentData = [
-    { id: "ALT-2026-001", name: "Patient Monitor", category: "Diagnostik", room: "ICU Utama", status: "Baik" },
-    { id: "ALT-2026-002", name: "Ventilator", category: "Pendukung Kehidupan", room: "ICU Ruang 2", status: "Perlu Perbaikan" },
-    { id: "ALT-2026-003", name: "ECG Machine", category: "Diagnostik", room: "Poli Jantung", status: "Baik" },
-    { id: "ALT-2026-004", name: "Infusion Pump", category: "Pendukung Kehidupan", room: "Rawat Inap 3", status: "Baik" },
-    { id: "ALT-2026-005", name: "Pulse Oximeter", category: "Diagnostik", room: "UGD", status: "Rusak" }
+    { id: "ALT-2026-001", name: "Patient Monitor", category: "Monitoring", room: "ICU Utama", status: "Baik", battery: 85, usage: 120 },
+    { id: "ALT-2026-002", name: "Ventilator", category: "Terapi & Bantuan Hidup", room: "ICU Ruang 2", status: "Perlu Perbaikan", battery: 40, usage: 350 },
+    { id: "ALT-2026-003", name: "ECG Machine", category: "Monitoring", room: "Poli Jantung", status: "Baik", battery: 95, usage: 80 },
+    { id: "ALT-2026-004", name: "Infusion Pump", category: "Terapi & Bantuan Hidup", room: "Rawat Inap 3", status: "Baik", battery: 90, usage: 210 },
+    { id: "ALT-2026-005", name: "Pulse Oximeter", category: "Monitoring", room: "UGD", status: "Rusak", battery: 15, usage: 500 }
 ];
 
-// Memuat data dari localStorage
 function loadEquipmentData() {
     const saved = localStorage.getItem("mediTrack_equipmentData");
     if (saved !== null) {
@@ -17,7 +16,6 @@ function loadEquipmentData() {
     return mockEquipmentData;
 }
 
-// Menyimpan data ke localStorage
 function saveEquipmentData(data) {
     localStorage.setItem("mediTrack_equipmentData", JSON.stringify(data));
 }
@@ -25,196 +23,190 @@ function saveEquipmentData(data) {
 let equipmentData = loadEquipmentData();
 
 document.addEventListener("DOMContentLoaded", () => {
-    const table = document.getElementById("equipmentTable");
-    const emptyState = document.getElementById("emptyState");
+    const tableBody = document.getElementById("equipmentTableBody");
     const searchInput = document.getElementById("searchInput");
     const statusFilter = document.getElementById("statusFilter");
-    const resultCount = document.getElementById("resultCount");
+    const tableInfo = document.getElementById("tableInfo");
 
-    let activeItemId = null;
-
-    // Memperbarui kartu statistik di bagian atas
-    function updateSummaryCards(data) {
-        const total = data.length;
-        const good = data.filter(item => item.status === "Baik").length;
-        const warn = data.filter(item => item.status === "Perlu Perbaikan").length;
-        const danger = data.filter(item => item.status === "Rusak").length;
-
-        if (document.getElementById("eqTotalCount")) document.getElementById("eqTotalCount").textContent = total;
-        if (document.getElementById("eqGoodCount")) document.getElementById("eqGoodCount").textContent = good;
-        if (document.getElementById("eqWarnCount")) document.getElementById("eqWarnCount").textContent = warn;
-        if (document.getElementById("eqDangerCount")) document.getElementById("eqDangerCount").textContent = danger;
+    function getStatusClass(status) {
+        if (status === "Perlu Perbaikan") return "status-warning";
+        if (status === "Rusak") return "status-critical";
+        return "status-good";
     }
 
-    // Render Tabel utama
+    // Render Tabel
     function renderTable() {
-        const search = searchInput ? searchInput.value.toLowerCase() : "";
-        const selectedStatus = statusFilter ? statusFilter.value : "Semua";
+        if (!tableBody) return;
+
+        const search = searchInput ? searchInput.value.toLowerCase().trim() : "";
+        const selectedStatus = statusFilter ? statusFilter.value : "ALL";
 
         const filtered = equipmentData.filter(item => {
             const matchesSearch = item.name.toLowerCase().includes(search) ||
                                   item.id.toLowerCase().includes(search) ||
                                   item.room.toLowerCase().includes(search);
-            const matchesStatus = selectedStatus === "Semua" || item.status === selectedStatus;
+            const matchesStatus = (selectedStatus === "ALL") || (item.status === selectedStatus);
             return matchesSearch && matchesStatus;
         });
 
-        table.innerHTML = "";
+        tableBody.innerHTML = "";
 
-        filtered.forEach(item => {
-            let statusClass = "status-good";
-            if (item.status === "Perlu Perbaikan") statusClass = "status-warning";
-            if (item.status === "Rusak") statusClass = "status-danger";
-
-            const row = document.createElement("tr");
-            row.innerHTML = `
-                <td>${item.id}</td>
-                <td><strong>${item.name}</strong></td>
-                <td>${item.category}</td>
-                <td>${item.room}</td>
-                <td><span class="status-badge ${statusClass}">${item.status}</span></td>
-                <td>
-                    <button class="btn-action view-btn" data-id="${item.id}">Detail</button>
-                    <button class="btn-action delete-btn" data-id="${item.id}">Hapus</button>
-                </td>
-            `;
-            table.appendChild(row);
-        });
-
-        if (resultCount) resultCount.textContent = `${filtered.length} alat`;
-        
         if (filtered.length === 0) {
-            if (emptyState) emptyState.style.display = "block";
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="6" style="text-align: center; padding: 2rem; color: #64748b;">
+                        Tidak ada data perangkat yang sesuai.
+                    </td>
+                </tr>
+            `;
         } else {
-            if (emptyState) emptyState.style.display = "none";
+            filtered.forEach(item => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td><strong>${item.id}</strong></td>
+                    <td>${item.name}</td>
+                    <td>${item.category || '-'}</td>
+                    <td>${item.room}</td>
+                    <td><span class="status-badge ${getStatusClass(item.status)}">${item.status}</span></td>
+                    <td style="text-align: center;">
+                        <button class="btn-action view-btn" data-id="${item.id}" title="Lihat Detail Pop-up">👁</button>
+                        <button class="btn-action delete-btn" data-id="${item.id}" title="Hapus Alat">🗑</button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
         }
 
-        // Perbarui angka kartu statistik
-        updateSummaryCards(equipmentData);
+        if (tableInfo) {
+            tableInfo.textContent = `Menampilkan ${filtered.length} dari ${equipmentData.length} alat`;
+        }
 
-        // Listener tombol Detail & Hapus di tabel
+        // BUKA POP-UP DETAIL
         document.querySelectorAll(".view-btn").forEach(btn => {
-            btn.addEventListener("click", (e) => openDetailModal(e.target.dataset.id));
+            btn.addEventListener("click", (e) => {
+                const id = e.currentTarget.dataset.id;
+                openDetailModal(id);
+            });
         });
 
+        // HAPUS ALAT
         document.querySelectorAll(".delete-btn").forEach(btn => {
-            btn.addEventListener("click", (e) => deleteSingleEquipment(e.target.dataset.id));
+            btn.addEventListener("click", (e) => {
+                const id = e.currentTarget.dataset.id;
+                if (confirm(`Apakah Anda yakin ingin menghapus perangkat ${id}?`)) {
+                    deleteSingleEquipment(id);
+                }
+            });
         });
     }
 
-    // MODAL DETAIL & EDIT STATUS
+    // LOGIKA POP-UP DETAIL
     const detailModal = document.getElementById("detailModal");
     function openDetailModal(id) {
         const item = equipmentData.find(eq => eq.id === id);
-        if (!item) return;
+        if (!item || !detailModal) return;
 
-        activeItemId = id;
-        document.getElementById("dtId").textContent = item.id;
+        let score = 95;
+        if (item.status === "Perlu Perbaikan") score = 65;
+        if (item.status === "Rusak") score = 30;
+
         document.getElementById("dtName").textContent = item.name;
-        document.getElementById("dtCategory").textContent = item.category;
-        document.getElementById("dtRoom").textContent = item.room;
+        document.getElementById("dtId").textContent = item.id;
+        document.getElementById("dtCategory").textContent = item.category || "-";
+        document.getElementById("dtRoom").textContent = item.room || "-";
+        
+        const statusBadge = document.getElementById("dtStatus");
+        statusBadge.textContent = item.status;
+        statusBadge.className = `status-badge ${getStatusClass(item.status)}`;
 
-        // Set pilihan dropdown status sesuai status alat saat ini
-        const statusSelect = document.getElementById("dtStatusSelect");
-        if (statusSelect) {
-            statusSelect.value = item.status;
-        }
+        document.getElementById("dtScore").textContent = `${score}%`;
+        document.getElementById("dtBattery").textContent = `${item.battery !== undefined ? item.battery : 85}%`;
+        document.getElementById("dtUsage").textContent = `${item.usage !== undefined ? item.usage : 0} jam`;
 
         detailModal.style.display = "flex";
     }
 
-    // MENYIMPAN PERUBAHAN STATUS
-    const saveStatusBtn = document.getElementById("saveStatusBtn");
-    if (saveStatusBtn) {
-        saveStatusBtn.onclick = () => {
-            if (!activeItemId) return;
+    const closeDetailModalBtn = document.getElementById("closeDetailModalBtn");
+    const cancelDetailModalBtn = document.getElementById("cancelDetailModalBtn");
+    const closeDetail = () => { if (detailModal) detailModal.style.display = "none"; };
 
-            const newStatus = document.getElementById("dtStatusSelect").value;
-            const targetItem = equipmentData.find(item => item.id === activeItemId);
+    if (closeDetailModalBtn) closeDetailModalBtn.onclick = closeDetail;
+    if (cancelDetailModalBtn) cancelDetailModalBtn.onclick = closeDetail;
 
-            if (targetItem) {
-                targetItem.status = newStatus;
-                saveEquipmentData(equipmentData);
-                renderTable();
-                detailModal.style.display = "none";
-            }
-        };
-    }
-
-    if (document.getElementById("closeDetailModal")) document.getElementById("closeDetailModal").onclick = () => detailModal.style.display = "none";
-    if (document.getElementById("cancelDetailModal")) document.getElementById("cancelDetailModal").onclick = () => detailModal.style.display = "none";
-
-    // HAPUS SATU ALAT
+    // HAPUS ALAT
     function deleteSingleEquipment(id) {
         equipmentData = equipmentData.filter(item => item.id !== id);
         saveEquipmentData(equipmentData);
         renderTable();
-        if (detailModal) detailModal.style.display = "none";
     }
 
-    if (document.getElementById("deleteOneBtn")) {
-        document.getElementById("deleteOneBtn").onclick = () => {
-            if (activeItemId) deleteSingleEquipment(activeItemId);
+    // MODAL TAMBAH ALAT
+    const equipmentModal = document.getElementById("equipmentModal");
+    const addEquipmentBtn = document.getElementById("addEquipmentBtn");
+    const closeModalBtn = document.getElementById("closeModalBtn");
+    const cancelModalBtn = document.getElementById("cancelModalBtn");
+    const equipmentForm = document.getElementById("equipmentForm");
+
+    if (addEquipmentBtn && equipmentModal) {
+        addEquipmentBtn.onclick = () => {
+            equipmentForm.reset();
+            equipmentModal.style.display = "flex";
         };
     }
 
-    // HAPUS SEMUA ALAT
-    const deleteAllModal = document.getElementById("confirmDeleteAllModal");
-    if (document.getElementById("deleteAllEquipment")) {
-        document.getElementById("deleteAllEquipment").onclick = () => deleteAllModal.style.display = "flex";
-    }
-    if (document.getElementById("closeConfirmDeleteAll")) {
-        document.getElementById("closeConfirmDeleteAll").onclick = () => deleteAllModal.style.display = "none";
-    }
-    if (document.getElementById("cancelDeleteAll")) {
-        document.getElementById("cancelDeleteAll").onclick = () => deleteAllModal.style.display = "none";
-    }
-    if (document.getElementById("confirmDeleteAllBtn")) {
-        document.getElementById("confirmDeleteAllBtn").onclick = () => {
-            equipmentData = [];
-            saveEquipmentData(equipmentData);
-            renderTable();
-            deleteAllModal.style.display = "none";
-        };
-    }
+    const closeModal = () => { if (equipmentModal) equipmentModal.style.display = "none"; };
+    if (closeModalBtn) closeModalBtn.onclick = closeModal;
+    if (cancelModalBtn) cancelModalBtn.onclick = closeModal;
 
-    // TAMBAH ALAT BARU
-    const addModal = document.getElementById("addModal");
-    if (document.getElementById("addEquipmentBtn")) {
-        document.getElementById("addEquipmentBtn").onclick = () => addModal.style.display = "flex";
-    }
-    if (document.getElementById("closeAddModal")) {
-        document.getElementById("closeAddModal").onclick = () => addModal.style.display = "none";
-    }
-    if (document.getElementById("cancelAddModal")) {
-        document.getElementById("cancelAddModal").onclick = () => addModal.style.display = "none";
-    }
-
-    if (document.getElementById("addForm")) {
-        document.getElementById("addForm").onsubmit = (e) => {
+    if (equipmentForm) {
+        equipmentForm.onsubmit = (e) => {
             e.preventDefault();
-            
-            const uniqueId = `ALT-${Math.floor(1000 + Math.random() * 9000)}`;
+
+            const uniqueId = `ALT-2026-${Math.floor(100 + Math.random() * 900)}`;
+            const usageValue = document.getElementById("inputUsage").value;
 
             const newItem = {
                 id: uniqueId,
-                name: document.getElementById("eqName").value,
-                category: document.getElementById("eqCategory").value,
-                room: document.getElementById("eqRoom").value,
-                status: document.getElementById("eqStatus").value
+                name: document.getElementById("inputName").value,
+                category: document.getElementById("inputCategory").value,
+                room: document.getElementById("inputRoom").value,
+                status: document.getElementById("inputStatus").value,
+                battery: 100,
+                usage: usageValue ? parseInt(usageValue, 10) : 0
             };
 
-            equipmentData.push(newItem);
+            equipmentData.unshift(newItem);
             saveEquipmentData(equipmentData);
             renderTable();
-            
-            addModal.style.display = "none";
-            document.getElementById("addForm").reset();
+
+            closeModal();
         };
     }
 
-    if (searchInput) searchInput.oninput = renderTable;
-    if (statusFilter) statusFilter.onchange = renderTable;
+    // Sync profil otomatis dari localStorage
+    function syncSidebarProfile() {
+        const savedProfile = localStorage.getItem("mediTrack_profile");
+        if (!savedProfile) return;
+
+        try {
+            const profile = JSON.parse(savedProfile);
+            const sidebarName = document.getElementById("sidebarName");
+            const sidebarRole = document.getElementById("sidebarRole");
+            const sidebarAvatar = document.getElementById("sidebarAvatar");
+            const topAvatar = document.getElementById("topAvatar");
+
+            if (sidebarName && profile.name) sidebarName.textContent = profile.name;
+            if (sidebarRole && profile.role) sidebarRole.textContent = profile.role;
+
+            if (profile.name) {
+                const initial = profile.name.trim().charAt(0).toUpperCase();
+                if (sidebarAvatar) sidebarAvatar.textContent = initial;
+                if (topAvatar) topAvatar.textContent = initial;
+            }
+        } catch (e) {
+            console.error("Gagal memuat profil:", e);
+        }
+    }
 
     renderTable();
 });

@@ -4,8 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Daftar Alat | MediTrackPRO</title>
-    <!-- Cek folder CSS: Gunakan ../css/equipment.css jika file HTML berada dalam folder pages/ -->
-    <link rel="stylesheet" href="../css/equipment.css">
+    <link rel="stylesheet" href="../css/global.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -29,17 +28,17 @@
             <a href="dashboard.html" class="nav-item"><span>▦</span> Dashboard</a>
             <a href="equipment.html" class="nav-item active"><span>▣</span> Daftar Alat</a>
             <a href="maintenance.html" class="nav-item"><span>⚙</span> Maintenance</a>
-            <a href="simulation.html" class="nav-item"><span>▶</span> Simulasi</a>
+            
 
             <p class="nav-label">LAINNYA</p>
-            <a href="#" class="nav-item" id="settingsLink"><span>⚙</span> Pengaturan</a>
+            <a href="setting.html" class="nav-item" id="settingsLink"><span>⚙</span> Pengaturan</a>
         </nav>
 
         <div class="sidebar-footer">
-            <div class="user-avatar">A</div>
+            <div class="user-avatar" id="sidebarAvatar">A</div>
             <div>
-                <strong>Administrator</strong>
-                <small>Monitoring Staff</small>
+                <strong id="sidebarName">Administrator</strong>
+                <small id="sidebarRole">Monitoring Staff</small>
             </div>
         </div>
     </aside>
@@ -97,17 +96,14 @@
                             </tr>
                         </thead>
                         <tbody id="equipmentTableBody">
-                            <!-- Data akan di-render secara dinamis oleh equipment.js -->
+                            <!-- Data di-render dinamis via JS -->
                         </tbody>
                     </table>
                 </div>
 
-                <!-- TABLE FOOTER / PAGINATION -->
+                <!-- TABLE FOOTER -->
                 <div class="table-footer">
                     <span class="table-info" id="tableInfo">Menampilkan 0 dari 0 alat</span>
-                    <div class="pagination" id="paginationControls">
-                        <!-- Tombol Halaman di-render via JS -->
-                    </div>
                 </div>
             </div>
 
@@ -117,16 +113,14 @@
 
 </div>
 
-<!-- MODAL FORM TAMBAH / EDIT ALAT (Ditambahkan style display:none agar tidak bocor jika CSS telat load) -->
+<!-- MODAL TAMBAH ALAT -->
 <div class="modal-overlay" id="equipmentModal" style="display: none;">
     <div class="modal-box">
         <div class="modal-header">
-            <h3 id="modalTitle">Tambah Perangkat Medis</h3>
+            <h3>Tambah Perangkat Medis</h3>
             <button class="close-btn" id="closeModalBtn">&times;</button>
         </div>
         <form id="equipmentForm">
-            <input type="hidden" id="equipmentIndex">
-            
             <div class="form-group">
                 <label for="inputName">Nama Alat</label>
                 <input type="text" id="inputName" required placeholder="Contoh: Patient Monitor">
@@ -140,7 +134,6 @@
                         <option value="Terapi & Bantuan Hidup">Terapi & Bantuan Hidup</option>
                         <option value="Laboratorium">Laboratorium</option>
                         <option value="Radiologi">Radiologi</option>
-                        <option value="Bedah">Bedah</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -169,6 +162,56 @@
                 <button type="submit" class="btn btn-primary">Simpan Data</button>
             </div>
         </form>
+    </div>
+</div>
+
+<!-- POP-UP MODAL DETAIL ALAT -->
+<div class="modal-overlay" id="detailModal" style="display: none;">
+    <div class="modal-box" style="max-width: 550px;">
+        <div class="modal-header">
+            <h3>Detail Perangkat Medis</h3>
+            <button class="close-btn" id="closeDetailModalBtn">&times;</button>
+        </div>
+        <div class="modal-body" style="padding: 15px 0;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; background: #f8fafc; padding: 12px; border-radius: 8px;">
+                <div>
+                    <h4 id="dtName" style="font-size: 16px; margin-bottom: 4px;">-</h4>
+                    <small id="dtId" style="color: #64748b;">-</small>
+                </div>
+                <span id="dtStatus" class="status-badge">-</span>
+            </div>
+
+            <!-- RINGKASAN METRIK (SKOR, BATERAI, JAM) -->
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px; text-align: center;">
+                <div style="background: #eff6ff; padding: 10px; border-radius: 8px;">
+                    <small style="color: #64748b; font-size: 11px;">Kondisi Score</small>
+                    <strong id="dtScore" style="display: block; font-size: 16px; color: #2563eb;">0%</strong>
+                </div>
+                <div style="background: #f0fdf4; padding: 10px; border-radius: 8px;">
+                    <small style="color: #64748b; font-size: 11px;">Sisa Baterai</small>
+                    <strong id="dtBattery" style="display: block; font-size: 16px; color: #16a34a;">0%</strong>
+                </div>
+                <div style="background: #fefce8; padding: 10px; border-radius: 8px;">
+                    <small style="color: #64748b; font-size: 11px;">Total Penggunaan</small>
+                    <strong id="dtUsage" style="display: block; font-size: 16px; color: #ca8a04;">0 jam</strong>
+                </div>
+            </div>
+
+            <!-- SPESIFIKASI DETAIL -->
+            <div style="display: flex; flex-direction: column; gap: 8px; font-size: 13px;">
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #f1f5f9; padding-bottom: 6px;">
+                    <span style="color: #64748b;">Kategori:</span>
+                    <strong id="dtCategory">-</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #f1f5f9; padding-bottom: 6px;">
+                    <span style="color: #64748b;">Ruangan / Lokasi:</span>
+                    <strong id="dtRoom">-</strong>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" id="cancelDetailModalBtn">Tutup</button>
+        </div>
     </div>
 </div>
 
