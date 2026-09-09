@@ -210,7 +210,7 @@ function renderEquipment(data = equipment) {
             <td>
                 <button
                     class="detail-button"
-                    onclick="viewEquipment('${item.id}')"
+                    onclick="showDetail('${item.id}')"
                 >
                     Detail →
                 </button>

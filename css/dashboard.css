@@ -53,77 +53,75 @@ button {
 ========================= */
 
 .sidebar {
-    width: var(--sidebar-width);
-    background: var(--white);
-    border-right: 1px solid var(--border);
-
-    position: fixed;
-    top: 0;
-    left: 0;
-    bottom: 0;
+    width: 250px;
+    background: white;
+    border-right: 1px solid #e5e7eb;
 
     display: flex;
     flex-direction: column;
 
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+
     z-index: 100;
 }
 
-.sidebar-logo {
+.sidebar-header {
+    height: 82px;
+    padding: 0 22px;
+
     display: flex;
     align-items: center;
     gap: 12px;
 
-    padding: 25px 22px;
-
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid #eef0f4;
 }
 
 .logo-icon {
     width: 40px;
     height: 40px;
 
-    border-radius: 10px;
+    border-radius: 11px;
+
+    background: #2563eb;
+    color: white;
 
     display: flex;
     align-items: center;
     justify-content: center;
 
-    background: var(--primary);
-    color: white;
-
-    font-size: 20px;
+    font-size: 21px;
     font-weight: 800;
 }
 
-.sidebar-logo h2 {
-    font-size: 16px;
+.sidebar-header h2 {
+    font-size: 17px;
 }
 
-.sidebar-logo h2 span {
-    color: var(--primary);
+.sidebar-header h2 span {
+    color: #2563eb;
 }
 
-.sidebar-logo small {
-    display: block;
-    margin-top: 3px;
-
-    color: var(--muted);
-    font-size: 9px;
+.sidebar-header small {
+    color: #94a3b8;
+    font-size: 10px;
 }
-
 
 .sidebar-nav {
-    padding: 25px 15px;
+    padding: 25px 14px;
+    flex: 1;
 }
 
-.nav-title {
-    color: #a0a8b7;
+.nav-label {
+    color: #94a3b8;
     font-size: 10px;
     font-weight: 700;
 
-    margin: 10px 10px 10px;
+    margin: 0 10px 10px;
 
-    letter-spacing: .8px;
+    letter-spacing: .7px;
 }
 
 .nav-item {
@@ -132,12 +130,11 @@ button {
     gap: 13px;
 
     padding: 12px 13px;
-    margin-bottom: 5px;
+    margin-bottom: 4px;
 
     border-radius: 9px;
 
-    text-decoration: none;
-    color: #687386;
+    color: #64748b;
 
     font-size: 13px;
     font-weight: 500;
@@ -148,54 +145,54 @@ button {
 .nav-item span {
     width: 20px;
     text-align: center;
-    font-size: 16px;
 }
 
 .nav-item:hover {
-    background: #f2f6ff;
-    color: var(--primary);
+    background: #f1f5ff;
+    color: #2563eb;
 }
 
 .nav-item.active {
-    background: #eaf2ff;
-    color: var(--primary);
+    background: #eff6ff;
+    color: #2563eb;
     font-weight: 600;
 }
 
-.sidebar-bottom {
-    margin-top: auto;
-    padding: 20px 18px;
+.sidebar-footer {
+    padding: 17px;
 
-    border-top: 1px solid var(--border);
-}
+    border-top: 1px solid #eef0f4;
 
-.prototype-badge {
     display: flex;
     align-items: center;
-    gap: 8px;
-
-    color: #737d90;
-    font-size: 11px;
-
-    margin-bottom: 15px;
+    gap: 10px;
 }
 
-.prototype-badge span {
-    width: 7px;
-    height: 7px;
+.user-avatar,
+.top-avatar {
+    width: 34px;
+    height: 34px;
 
-    background: #22c55e;
     border-radius: 50%;
+
+    background: #dbeafe;
+    color: #2563eb;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-weight: 700;
 }
 
-.back-home {
-    color: var(--muted);
-    font-size: 11px;
-    text-decoration: none;
+.sidebar-footer strong {
+    display: block;
+    font-size: 12px;
 }
 
-.back-home:hover {
-    color: var(--primary);
+.sidebar-footer small {
+    color: #94a3b8;
+    font-size: 10px;
 }
 
 

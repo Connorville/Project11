@@ -284,13 +284,7 @@ document.getElementById("backButton").addEventListener(
 document.getElementById("maintenanceButton").addEventListener(
     "click",
     () => {
-
-        alert(
-            `Maintenance ${selectedEquipment.name}\n\n` +
-            `Jadwal pemeriksaan: ${selectedEquipment.calibration} hari lagi.\n\n` +
-            `Fitur maintenance akan dikembangkan pada tahap berikutnya.`
-        );
-
+        window.location.href = "maintenance.html";
     }
 );
 

@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Simulasi Penggunaan | MediTrackPRO</title>
+
+    <link rel="stylesheet" href="../css/simulation.css">
+</head>
+
+<body>
+
+<div class="app-layout">
+
+    <aside class="sidebar" id="sidebar">
+
+        <div class="sidebar-header">
+            <div class="logo-icon">M</div>
+
+            <div>
+                <h2>MediTrack<span>PRO</span></h2>
+                <small>Medical Equipment</small>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+
+            <p class="nav-label">MENU UTAMA</p>
+
+            <a href="dashboard.html" class="nav-item">
+                <span>▦</span>
+                Dashboard
+            </a>
+
+            <a href="equipment.html" class="nav-item">
+                <span>▣</span>
+                Daftar Alat
+            </a>
+
+            <a href="maintenance.html" class="nav-item">
+                <span>⚙</span>
+                Maintenance
+            </a>
+
+            <a href="simulation.html" class="nav-item active">
+                <span>▶</span>
+                Simulasi
+            </a>
+
+            <p class="nav-label">LAINNYA</p>
+
+            <a href="#" class="nav-item" id="settingsLink">
+                <span>⚙</span>
+                Pengaturan
+            </a>
+
+        </nav>
+
+        <div class="sidebar-footer">
+
+            <div class="user-avatar">A</div>
+
+            <div>
+                <strong>Administrator</strong>
+                <small>Monitoring Staff</small>
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <main class="main-content">
+
+        <header class="topbar">
+
+            <button class="menu-button" id="menuButton">
+                ☰
+            </button>
+
+            <div class="page-title">
+                <span>Simulasi Penggunaan</span>
+                <small>Simulasi monitoring penggunaan alat medis</small>
+            </div>
+
+            <div class="topbar-right">
+
+                <div class="notification">
+                    🔔
+                    <span class="notification-dot"></span>
+                </div>
+
+                <div class="top-avatar">A</div>
+
+            </div>
+
+        </header>
+
+
+        <section class="content">
+
+            <div class="content-header">
+
+                <div>
+                    <h1>Simulasi Penggunaan Alat</h1>
+
+                    <p>
+                        Pilih alat medis dan jalankan simulasi penggunaan.
+                    </p>
+                </div>
+
+            </div>
+
+
+            <div class="simulation-layout">
+
+                <!-- CONTROL -->
+                <div class="card control-card">
+
+                    <div class="card-title">
+                        <h2>Kontrol Simulasi</h2>
+                        <p>Pilih alat yang ingin digunakan.</p>
+                    </div>
+
+                    <label for="equipmentSelect">
+                        Pilih Alat
+                    </label>
+
+                    <select id="equipmentSelect">
+
+                        <option value="MD-2026-001">
+                            Patient Monitor
+                        </option>
+
+                        <option value="MD-2026-002">
+                            Ventilator
+                        </option>
+
+                        <option value="MD-2026-003">
+                            ECG Machine
+                        </option>
+
+                        <option value="MD-2026-004">
+                            Infusion Pump
+                        </option>
+
+                        <option value="MD-2026-005">
+                            Pulse Oximeter
+                        </option>
+
+                    </select>
+
+
+                    <div class="selected-equipment">
+
+                        <div class="equipment-icon">
+                            +
+                        </div>
+
+                        <div>
+                            <strong id="selectedName">
+                                Patient Monitor
+                            </strong>
+
+                            <small id="selectedId">
+                                MD-2026-001
+                            </small>
+                        </div>
+
+                    </div>
+
+
+                    <div class="simulation-control">
+
+                        <label>
+                            Durasi Penggunaan
+                        </label>
+
+                        <div class="duration-control">
+
+                            <button id="decreaseDuration">
+                                −
+                            </button>
+
+                            <strong>
+                                <span id="duration">1</span> jam
+                            </strong>
+
+                            <button id="increaseDuration">
+                                +
+                            </button>
+
+                        </div>
+
+                    </div>
+
+
+                    <button
+                        class="start-button"
+                        id="startSimulation"
+                    >
+                        ▶ Mulai Simulasi
+                    </button>
+
+                    <button
+                        class="reset-button"
+                        id="resetSimulation"
+                    >
+                        Reset
+                    </button>
+
+                </div>
+
+
+                <!-- MONITOR -->
+                <div class="card monitor-card">
+
+                    <div class="monitor-header">
+
+                        <div>
+                            <h2>Status Alat</h2>
+                            <p>Kondisi alat secara real-time</p>
+                        </div>
+
+                        <span
+                            class="simulation-status"
+                            id="simulationStatus"
+                        >
+                            Siap
+                        </span>
+
+                    </div>
+
+
+                    <div class="monitor-equipment">
+
+                        <div class="large-equipment-icon">
+                            +
+                        </div>
+
+                        <div>
+                            <h2 id="monitorName">
+                                Patient Monitor
+                            </h2>
+
+                            <p id="monitorType">
+                                Diagnostik
+                            </p>
+                        </div>
+
+                    </div>
+
+
+                    <div class="metrics">
+
+                        <div class="metric">
+
+                            <div class="metric-top">
+                                <span>Baterai</span>
+                                <strong id="batteryValue">
+                                    87%
+                                </strong>
+                            </div>
+
+                            <div class="progress">
+                                <div
+                                    class="progress-bar battery"
+                                    id="batteryBar"
+                                    style="width: 87%"
+                                ></div>
+                            </div>
+
+                        </div>
+
+
+                        <div class="metric">
+
+                            <div class="metric-top">
+                                <span>Total Penggunaan</span>
+                                <strong id="usageValue">
+                                    128 jam
+                                </strong>
+                            </div>
+
+                            <div class="progress">
+                                <div
+                                    class="progress-bar usage"
+                                    id="usageBar"
+                                    style="width: 35%"
+                                ></div>
+                            </div>
+
+                        </div>
+
+
+                        <div class="metric">
+
+                            <div class="metric-top">
+                                <span>Skor Kondisi</span>
+                                <strong id="scoreValue">
+                                    94
+                                </strong>
+                            </div>
+
+                            <div class="progress">
+                                <div
+                                    class="progress-bar score"
+                                    id="scoreBar"
+                                    style="width: 94%"
+                                ></div>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="simulation-log">
+
+                        <div class="log-header">
+                            <h3>Log Simulasi</h3>
+
+                            <button id="clearLog">
+                                Hapus
+                            </button>
+                        </div>
+
+                        <div id="logContainer">
+
+                            <div class="log-empty">
+                                Belum ada aktivitas simulasi.
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="info-card">
+
+                <div class="info-icon">
+                    ℹ
+                </div>
+
+                <div>
+
+                    <h3>Tentang Simulasi</h3>
+
+                    <p>
+                        Simulasi ini merupakan fitur prototype untuk
+                        memperlihatkan perubahan parameter alat ketika
+                        digunakan. Data simulasi tidak mengubah data
+                        perangkat secara permanen.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<script src="../js/simulation.js"></script>
+
+</body>
+</html>

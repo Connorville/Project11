@@ -281,7 +281,7 @@ function updateSummary() {
 ========================= */
 
 function showDetail(id) {
-    window.location.href = `equipment_detail.html?id=${id}`;
+    window.location.href = `detail.html?id=${id}`;
 }
 
 

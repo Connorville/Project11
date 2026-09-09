@@ -6,7 +6,7 @@
 
     <title>MediTrackPRO | Daftar Alat</title>
 
-    <link rel="stylesheet" href="equipment.css">
+    <link rel="stylesheet" href="../css/equipment.css">
 
     <!-- Google Font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -17,61 +17,62 @@
 <body>
 
     <!-- ================= SIDEBAR ================= -->
-    <aside class="sidebar" id="sidebar">
+     <aside class="sidebar" id="sidebar">
 
-        <div class="sidebar-logo">
-            <div class="logo-icon">+</div>
+        <div class="sidebar-header">
+            <div class="logo-icon">M</div>
+
             <div>
-                <strong>MediTrack<span>PRO</span></strong>
+                <h2>MediTrack<span>PRO</span></h2>
                 <small>Medical Equipment</small>
             </div>
         </div>
 
+
         <nav class="sidebar-nav">
 
-            <div class="nav-section">
-                <span class="nav-title">MENU UTAMA</span>
+            <p class="nav-label">MENU UTAMA</p>
 
-                <a href="dashboard.html" class="nav-item">
-                    <span class="nav-icon">▦</span>
-                    <span>Dashboard</span>
-                </a>
+            <a href="dashboard.html" class="nav-item">
+                <span>▦</span>
+                Dashboard
+            </a>
 
-                <a href="equipment.html" class="nav-item active">
-                    <span class="nav-icon">▣</span>
-                    <span>Daftar Alat</span>
-                </a>
+            <a href="equipment.html" class="nav-item">
+                <span>▣</span>
+                Daftar Alat
+            </a>
 
-                <a href="#" class="nav-item" id="maintenanceLink">
-                    <span class="nav-icon">🔧</span>
-                    <span>Maintenance</span>
-                </a>
+            <a href="maintenance.html" class="nav-item">
+                <span>⚙</span>
+                Maintenance
+            </a>
 
-                <a href="#" class="nav-item" id="simulationLink">
-                    <span class="nav-icon">⚡</span>
-                    <span>Simulasi</span>
-                </a>
-            </div>
+            <a href="simulation.html" class="nav-item active">
+                <span>▶</span>
+                Simulasi
+            </a>
 
-            <div class="nav-section">
-                <span class="nav-title">LAINNYA</span>
 
-                <a href="#" class="nav-item" id="settingsLink">
-                    <span class="nav-icon">⚙</span>
-                    <span>Pengaturan</span>
-                </a>
-            </div>
+            <p class="nav-label">LAINNYA</p>
+
+            <a href="#" class="nav-item" id="settingsLink">
+                <span>⚙</span>
+                Pengaturan
+            </a>
 
         </nav>
 
+
         <div class="sidebar-footer">
-            <div class="system-status">
-                <span class="status-dot"></span>
-                <div>
-                    <strong>System Active</strong>
-                    <small>Prototype Mode</small>
-                </div>
+
+            <div class="user-avatar">A</div>
+
+            <div>
+                <strong>Administrator</strong>
+                <small>Monitoring Staff</small>
             </div>
+
         </div>
 
     </aside>
@@ -261,7 +262,7 @@
     </main>
 
 
-    <script src="equipment.js"></script>
+    <script src="../js/equipment.js"></script>
 
 </body>
 </html>

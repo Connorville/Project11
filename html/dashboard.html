@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="dashboard.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
 </head>
 
 <body>
@@ -17,21 +17,23 @@
 <div class="dashboard-layout">
 
     <!-- SIDEBAR -->
-    <aside class="sidebar" id="sidebar">
+   <aside class="sidebar" id="sidebar">
 
-        <div class="sidebar-logo">
+        <div class="sidebar-header">
             <div class="logo-icon">M</div>
+
             <div>
                 <h2>MediTrack<span>PRO</span></h2>
                 <small>Medical Equipment</small>
             </div>
         </div>
 
+
         <nav class="sidebar-nav">
 
-            <p class="nav-title">MENU UTAMA</p>
+            <p class="nav-label">MENU UTAMA</p>
 
-            <a href="dashboard.html" class="nav-item active">
+            <a href="dashboard.html" class="nav-item">
                 <span>▦</span>
                 Dashboard
             </a>
@@ -41,34 +43,36 @@
                 Daftar Alat
             </a>
 
-            <a href="#" class="nav-item">
-                <span>＋</span>
-                Tambah Alat
-            </a>
-
-            <p class="nav-title">MANAJEMEN</p>
-
-            <a href="#" class="nav-item">
-                <span>◷</span>
+            <a href="maintenance.html" class="nav-item">
+                <span>⚙</span>
                 Maintenance
             </a>
 
-            <a href="#" class="nav-item">
-                <span>↻</span>
-                Aktivitas
+            <a href="simulation.html" class="nav-item active">
+                <span>▶</span>
+                Simulasi
+            </a>
+
+
+            <p class="nav-label">LAINNYA</p>
+
+            <a href="#" class="nav-item" id="settingsLink">
+                <span>⚙</span>
+                Pengaturan
             </a>
 
         </nav>
 
-        <div class="sidebar-bottom">
-            <div class="prototype-badge">
-                <span></span>
-                Prototype Mode
+
+        <div class="sidebar-footer">
+
+            <div class="user-avatar">A</div>
+
+            <div>
+                <strong>Administrator</strong>
+                <small>Monitoring Staff</small>
             </div>
 
-            <a href="index.html" class="back-home">
-                ← Kembali ke Landing Page
-            </a>
         </div>
 
     </aside>
@@ -337,7 +341,7 @@
 </div>
 
 
-<script src="dashboard.js"></script>
+<script src="../js/dashboard.js"></script>
 
 </body>
 </html>
