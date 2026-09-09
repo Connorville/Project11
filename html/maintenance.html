@@ -3,312 +3,182 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Maintenance | MediTrackPRO</title>
-
-    <link rel="stylesheet" href="../css/maintenance.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 
 <body>
 
-<div class="app-layout">
+<div class="dashboard-layout">
 
     <!-- SIDEBAR -->
     <aside class="sidebar" id="sidebar">
-
         <div class="sidebar-header">
             <div class="logo-icon">M</div>
-
             <div>
                 <h2>MediTrack<span>PRO</span></h2>
                 <small>Medical Equipment</small>
             </div>
         </div>
 
-
         <nav class="sidebar-nav">
-
             <p class="nav-label">MENU UTAMA</p>
-
             <a href="dashboard.html" class="nav-item">
-                <span>▦</span>
-                Dashboard
+                <span>▦</span> Dashboard
             </a>
-
             <a href="equipment.html" class="nav-item">
-                <span>▣</span>
-                Daftar Alat
+                <span>▣</span> Daftar Alat
             </a>
-
-            <a href="maintenance.html" class="nav-item">
-                <span>⚙</span>
-                Maintenance
+            <a href="maintenance.html" class="nav-item active">
+                <span>⚙</span> Maintenance
             </a>
-
-            <a href="simulation.html" class="nav-item active">
-                <span>▶</span>
-                Simulasi
+            <a href="simulation.html" class="nav-item">
+                <span>▶</span> Simulasi
             </a>
-
 
             <p class="nav-label">LAINNYA</p>
-
             <a href="#" class="nav-item" id="settingsLink">
-                <span>⚙</span>
-                Pengaturan
+                <span>⚙</span> Pengaturan
             </a>
-
         </nav>
 
-
         <div class="sidebar-footer">
-
             <div class="user-avatar">A</div>
-
             <div>
                 <strong>Administrator</strong>
                 <small>Monitoring Staff</small>
             </div>
-
         </div>
-
     </aside>
 
-
-    <!-- MAIN -->
+    <!-- MAIN CONTENT -->
     <main class="main-content">
 
-        <!-- TOPBAR -->
-        <header class="topbar">
-
-            <button class="menu-button" id="menuButton">
-                ☰
-            </button>
-
-            <div class="page-title">
-                <span>Maintenance</span>
-                <small>Kelola pemeriksaan dan pemeliharaan alat medis</small>
+        <!-- HEADER -->
+        <header class="top-header">
+            <button class="mobile-menu" id="mobileMenu">☰</button>
+            <div>
+                <p class="breadcrumb">MediTrackPRO / Maintenance</p>
+                <h1>Jadwal & Pemeliharaan Alat</h1>
             </div>
 
-            <div class="topbar-right">
-
-                <div class="notification">
-                    🔔
-                    <span class="notification-dot"></span>
+            <div class="header-right">
+                <button class="notification-btn">♢<span class="notification-dot"></span></button>
+                <div class="profile">
+                    <div class="profile-avatar">A</div>
+                    <div>
+                        <strong>Admin</strong>
+                        <small>Petugas Medis</small>
+                    </div>
                 </div>
-
-                <div class="top-avatar">A</div>
-
             </div>
-
         </header>
 
+        <!-- WELCOME SECTION -->
+        <section class="welcome-section">
+            <div>
+                <p class="greeting">Daftar alat medis yang membutuhkan perbaikan atau perawatan berkala.</p>
+            </div>
+        </section>
 
-        <!-- CONTENT -->
-        <section class="content">
+        <!-- STAT CARDS / SUMMARY MAINTENANCE -->
+        <section class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon orange">!</div>
+                <div class="stat-info">
+                    <p>Perlu Perbaikan</p>
+                    <h3 id="maintWarnCount">0</h3>
+                    <span class="stat-description">Membutuhkan perbaikan</span>
+                </div>
+            </div>
 
-            <!-- PAGE HEADER -->
-            <div class="content-header">
+            <div class="stat-card">
+                <div class="stat-icon red">⚠</div>
+                <div class="stat-info">
+                    <p>Rusak</p>
+                    <h3 id="maintDangerCount">0</h3>
+                    <span class="stat-description">Perlu tindakan segera</span>
+                </div>
+            </div>
 
+            <div class="stat-card">
+                <div class="stat-icon blue">⚙</div>
+                <div class="stat-info">
+                    <p>Total Maintenance</p>
+                    <h3 id="maintTotalCount">0</h3>
+                    <span class="stat-description">Alat dalam pengawasan</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- TABLE CARD -->
+        <section class="dashboard-card">
+            <div class="card-header">
                 <div>
-                    <h1>Maintenance Alat</h1>
-
-                    <p>
-                        Pantau jadwal pemeriksaan dan pemeliharaan
-                        seluruh alat medis.
-                    </p>
+                    <p class="card-label">PEMELIHARAAN</p>
+                    <h3>Daftar Alat Bermasalah</h3>
                 </div>
-
-                <button class="btn btn-primary" id="addMaintenance">
-                    + Jadwalkan Maintenance
-                </button>
-
+                <span id="maintResultCount" style="color: var(--muted); font-size: 11px;">0 alat</span>
+            </div>
+            
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID ALAT</th>
+                            <th>NAMA ALAT</th>
+                            <th>RUANGAN</th>
+                            <th>STATUS</th>
+                            <th>AKSI</th>
+                        </tr>
+                    </thead>
+                    <tbody id="maintenanceTable">
+                        <!-- Dynamic render via JS -->
+                    </tbody>
+                </table>
             </div>
 
-
-            <!-- STATISTICS -->
-            <div class="stats-grid">
-
-                <div class="stat-card">
-
-                    <div class="stat-icon total">
-                        ⚙
-                    </div>
-
-                    <div>
-                        <span>Total Jadwal</span>
-                        <strong id="totalMaintenance">5</strong>
-                        <small>maintenance</small>
-                    </div>
-
-                </div>
-
-
-                <div class="stat-card">
-
-                    <div class="stat-icon pending">
-                        ◷
-                    </div>
-
-                    <div>
-                        <span>Menunggu</span>
-                        <strong id="pendingMaintenance">2</strong>
-                        <small>belum dikerjakan</small>
-                    </div>
-
-                </div>
-
-
-                <div class="stat-card">
-
-                    <div class="stat-icon progress">
-                        ↻
-                    </div>
-
-                    <div>
-                        <span>Dalam Proses</span>
-                        <strong id="progressMaintenance">1</strong>
-                        <small>sedang diperiksa</small>
-                    </div>
-
-                </div>
-
-
-                <div class="stat-card">
-
-                    <div class="stat-icon completed">
-                        ✓
-                    </div>
-
-                    <div>
-                        <span>Selesai</span>
-                        <strong id="completedMaintenance">2</strong>
-                        <small>maintenance selesai</small>
-                    </div>
-
-                </div>
-
+            <div class="empty-state" id="maintEmptyState" style="display: none; padding: 40px; text-align: center;">
+                <h3>Tidak ada alat bermasalah</h3>
+                <p style="color: var(--muted); font-size: 11px;">Semua peralatan medis saat ini dalam kondisi baik.</p>
             </div>
-
-
-            <!-- FILTER -->
-            <div class="toolbar">
-
-                <div class="search-box">
-
-                    <span>⌕</span>
-
-                    <input
-                        type="text"
-                        id="searchInput"
-                        placeholder="Cari nama alat atau ID..."
-                    >
-
-                </div>
-
-
-                <select id="statusFilter">
-
-                    <option value="Semua">Semua Status</option>
-                    <option value="Menunggu">Menunggu</option>
-                    <option value="Dalam Proses">Dalam Proses</option>
-                    <option value="Selesai">Selesai</option>
-
-                </select>
-
-            </div>
-
-
-            <!-- MAINTENANCE TABLE -->
-            <div class="card">
-
-                <div class="card-header">
-
-                    <div>
-                        <h2>Jadwal Maintenance</h2>
-
-                        <p>
-                            Daftar pemeriksaan alat medis
-                        </p>
-                    </div>
-
-                    <span id="resultCount">
-                        5 jadwal
-                    </span>
-
-                </div>
-
-
-                <div class="table-wrapper">
-
-                    <table>
-
-                        <thead>
-
-                            <tr>
-                                <th>ID ALAT</th>
-                                <th>NAMA ALAT</th>
-                                <th>JENIS</th>
-                                <th>JADWAL</th>
-                                <th>STATUS</th>
-                                <th>AKSI</th>
-                            </tr>
-
-                        </thead>
-
-                        <tbody id="maintenanceTable">
-
-                        </tbody>
-
-                    </table>
-
-                </div>
-
-
-                <div class="empty-state" id="emptyState">
-
-                    <div>⌕</div>
-
-                    <h3>Data tidak ditemukan</h3>
-
-                    <p>
-                        Tidak ada jadwal maintenance yang sesuai.
-                    </p>
-
-                </div>
-
-            </div>
-
-
-            <!-- INFO -->
-            <div class="info-card">
-
-                <div class="info-icon">
-                    ℹ
-                </div>
-
-                <div>
-
-                    <h3>Informasi Maintenance</h3>
-
-                    <p>
-                        Maintenance dilakukan untuk memastikan alat medis
-                        tetap dalam kondisi optimal dan aman digunakan.
-                        Pastikan setiap pemeriksaan dicatat setelah selesai.
-                    </p>
-
-                </div>
-
-            </div>
-
         </section>
 
     </main>
 
 </div>
 
+<!-- MODAL UPDATE STATUS KONDISI ALAT -->
+<div class="modal-overlay" id="maintModal" style="display: none;">
+    <div class="modal-card">
+        <div class="modal-header">
+            <h3>Update Pemeliharaan Alat</h3>
+            <button class="close-btn" id="closeMaintModal">&times;</button>
+        </div>
+        <div class="modal-body-detail">
+            <div class="detail-row"><span class="detail-label">ID Alat:</span><strong id="maintDtId">-</strong></div>
+            <div class="detail-row"><span class="detail-label">Nama Alat:</span><span id="maintDtName">-</span></div>
+            <div class="detail-row"><span class="detail-label">Ruangan:</span><span id="maintDtRoom">-</span></div>
+            
+            <div class="detail-row" style="margin-top: 10px;">
+                <span class="detail-label">Ubah Status Kondisi:</span>
+                <select id="maintStatusSelect" style="padding: 6px 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 11px; outline: none; font-weight: 600;">
+                    <option value="Perlu Perbaikan">Perlu Perbaikan</option>
+                    <option value="Rusak">Rusak</option>
+                    <option value="Baik">Baik (Selesai Perbaikan)</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-actions" style="margin-top: 20px;">
+            <button type="button" class="btn-secondary" id="cancelMaintModal">Batal</button>
+            <button type="button" class="primary-button" id="saveMaintStatusBtn">Simpan Perubahan</button>
+        </div>
+    </div>
+</div>
 
 <script src="../js/maintenance.js"></script>
-
 </body>
 </html>

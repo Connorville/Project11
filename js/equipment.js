@@ -1,410 +1,220 @@
-/* =========================
-   DATA ALAT MEDIS
-========================= */
-
-const equipment = [
-    {
-        id: "MD-2026-001",
-        name: "Patient Monitor",
-        type: "Diagnostik",
-        usage: 128,
-        battery: 87,
-        calibration: 12,
-        score: 94,
-        status: "Baik"
-    },
-
-    {
-        id: "MD-2026-002",
-        name: "Ventilator",
-        type: "Pendukung Kehidupan",
-        usage: 245,
-        battery: 62,
-        calibration: 35,
-        score: 76,
-        status: "Perlu Periksa"
-    },
-
-    {
-        id: "MD-2026-003",
-        name: "ECG Machine",
-        type: "Diagnostik",
-        usage: 87,
-        battery: 91,
-        calibration: 8,
-        score: 97,
-        status: "Baik"
-    },
-
-    {
-        id: "MD-2026-004",
-        name: "Infusion Pump",
-        type: "Pendukung Kehidupan",
-        usage: 312,
-        battery: 44,
-        calibration: 58,
-        score: 61,
-        status: "Kritis"
-    },
-
-    {
-        id: "MD-2026-005",
-        name: "Pulse Oximeter",
-        type: "Diagnostik",
-        usage: 174,
-        battery: 78,
-        calibration: 20,
-        score: 89,
-        status: "Baik"
-    }
+// Data Mock Bawaan
+const mockEquipmentData = [
+    { id: "ALT-2026-001", name: "Patient Monitor", category: "Diagnostik", room: "ICU Utama", status: "Baik" },
+    { id: "ALT-2026-002", name: "Ventilator", category: "Pendukung Kehidupan", room: "ICU Ruang 2", status: "Perlu Perbaikan" },
+    { id: "ALT-2026-003", name: "ECG Machine", category: "Diagnostik", room: "Poli Jantung", status: "Baik" },
+    { id: "ALT-2026-004", name: "Infusion Pump", category: "Pendukung Kehidupan", room: "Rawat Inap 3", status: "Baik" },
+    { id: "ALT-2026-005", name: "Pulse Oximeter", category: "Diagnostik", room: "UGD", status: "Rusak" }
 ];
 
-
-/* =========================
-   ELEMENT
-========================= */
-
-const tableBody = document.getElementById("equipmentTable");
-
-const searchInput = document.getElementById("searchInput");
-
-const categoryFilter =
-    document.getElementById("categoryFilter");
-
-const statusFilter =
-    document.getElementById("statusFilter");
-
-const equipmentCount =
-    document.getElementById("equipmentCount");
-
-const emptyState =
-    document.getElementById("emptyState");
-
-const resetFilter =
-    document.getElementById("resetFilter");
-
-
-/* =========================
-   STATUS CLASS
-========================= */
-
-function getStatusClass(status) {
-
-    if (status === "Baik") {
-        return "good";
+// Memuat data dari localStorage
+function loadEquipmentData() {
+    const saved = localStorage.getItem("mediTrack_equipmentData");
+    if (saved !== null) {
+        return JSON.parse(saved);
     }
-
-    if (status === "Perlu Periksa") {
-        return "warning";
-    }
-
-    return "critical";
+    localStorage.setItem("mediTrack_equipmentData", JSON.stringify(mockEquipmentData));
+    return mockEquipmentData;
 }
 
-
-/* =========================
-   RENDER TABLE
-========================= */
-
-function renderEquipment(data) {
-
-    tableBody.innerHTML = "";
-
-    if (data.length === 0) {
-
-        emptyState.style.display = "block";
-
-        equipmentCount.textContent = "0 alat";
-
-        return;
-    }
-
-    emptyState.style.display = "none";
-
-    equipmentCount.textContent =
-        `${data.length} alat`;
-
-    data.forEach(item => {
-
-        const row = document.createElement("tr");
-
-        row.innerHTML = `
-            <td>
-                <div class="equipment-info">
-
-                    <div class="equipment-icon">
-                        +
-                    </div>
-
-                    <div>
-                        <strong>${item.name}</strong>
-                        <small>${item.id}</small>
-                    </div>
-
-                </div>
-            </td>
-
-            <td>
-                <span class="category">
-                    ${item.type}
-                </span>
-            </td>
-
-            <td>
-                <span class="data-value">
-                    ${item.usage} kali
-                </span>
-            </td>
-
-            <td>
-
-                <span class="data-value">
-                    ${item.battery}%
-                </span>
-
-                <div class="progress-mini">
-                    <div
-                        class="progress-mini-fill"
-                        style="width: ${item.battery}%">
-                    </div>
-                </div>
-
-            </td>
-
-            <td>
-                <span class="data-value">
-                    ${item.calibration} hari
-                </span>
-            </td>
-
-            <td>
-                <span class="status ${getStatusClass(item.status)}">
-                    ${item.status}
-                </span>
-            </td>
-
-            <td>
-                <button
-                    class="detail-button"
-                    onclick="showDetail('${item.id}')">
-                    Detail
-                </button>
-            </td>
-        `;
-
-        tableBody.appendChild(row);
-    });
+// Menyimpan data ke localStorage
+function saveEquipmentData(data) {
+    localStorage.setItem("mediTrack_equipmentData", JSON.stringify(data));
 }
 
+let equipmentData = loadEquipmentData();
 
-/* =========================
-   FILTER
-========================= */
+document.addEventListener("DOMContentLoaded", () => {
+    const table = document.getElementById("equipmentTable");
+    const emptyState = document.getElementById("emptyState");
+    const searchInput = document.getElementById("searchInput");
+    const statusFilter = document.getElementById("statusFilter");
+    const resultCount = document.getElementById("resultCount");
 
-function filterEquipment() {
+    let activeItemId = null;
 
-    const search =
-        searchInput.value.toLowerCase();
+    // Memperbarui kartu statistik di bagian atas
+    function updateSummaryCards(data) {
+        const total = data.length;
+        const good = data.filter(item => item.status === "Baik").length;
+        const warn = data.filter(item => item.status === "Perlu Perbaikan").length;
+        const danger = data.filter(item => item.status === "Rusak").length;
 
-    const category =
-        categoryFilter.value;
+        if (document.getElementById("eqTotalCount")) document.getElementById("eqTotalCount").textContent = total;
+        if (document.getElementById("eqGoodCount")) document.getElementById("eqGoodCount").textContent = good;
+        if (document.getElementById("eqWarnCount")) document.getElementById("eqWarnCount").textContent = warn;
+        if (document.getElementById("eqDangerCount")) document.getElementById("eqDangerCount").textContent = danger;
+    }
 
-    const status =
-        statusFilter.value;
+    // Render Tabel utama
+    function renderTable() {
+        const search = searchInput ? searchInput.value.toLowerCase() : "";
+        const selectedStatus = statusFilter ? statusFilter.value : "Semua";
 
-    const filtered =
-        equipment.filter(item => {
-
-            const matchesSearch =
-                item.name.toLowerCase().includes(search) ||
-                item.id.toLowerCase().includes(search);
-
-            const matchesCategory =
-                category === "all" ||
-                item.type === category;
-
-            const matchesStatus =
-                status === "all" ||
-                item.status === status;
-
-            return (
-                matchesSearch &&
-                matchesCategory &&
-                matchesStatus
-            );
+        const filtered = equipmentData.filter(item => {
+            const matchesSearch = item.name.toLowerCase().includes(search) ||
+                                  item.id.toLowerCase().includes(search) ||
+                                  item.room.toLowerCase().includes(search);
+            const matchesStatus = selectedStatus === "Semua" || item.status === selectedStatus;
+            return matchesSearch && matchesStatus;
         });
 
-    renderEquipment(filtered);
-}
+        table.innerHTML = "";
 
+        filtered.forEach(item => {
+            let statusClass = "status-good";
+            if (item.status === "Perlu Perbaikan") statusClass = "status-warning";
+            if (item.status === "Rusak") statusClass = "status-danger";
 
-/* =========================
-   SUMMARY
-========================= */
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td>${item.id}</td>
+                <td><strong>${item.name}</strong></td>
+                <td>${item.category}</td>
+                <td>${item.room}</td>
+                <td><span class="status-badge ${statusClass}">${item.status}</span></td>
+                <td>
+                    <button class="btn-action view-btn" data-id="${item.id}">Detail</button>
+                    <button class="btn-action delete-btn" data-id="${item.id}">Hapus</button>
+                </td>
+            `;
+            table.appendChild(row);
+        });
 
-function updateSummary() {
+        if (resultCount) resultCount.textContent = `${filtered.length} alat`;
+        
+        if (filtered.length === 0) {
+            if (emptyState) emptyState.style.display = "block";
+        } else {
+            if (emptyState) emptyState.style.display = "none";
+        }
 
-    const total =
-        equipment.length;
+        // Perbarui angka kartu statistik
+        updateSummaryCards(equipmentData);
 
-    const good =
-        equipment.filter(
-            item => item.status === "Baik"
-        ).length;
+        // Listener tombol Detail & Hapus di tabel
+        document.querySelectorAll(".view-btn").forEach(btn => {
+            btn.addEventListener("click", (e) => openDetailModal(e.target.dataset.id));
+        });
 
-    const check =
-        equipment.filter(
-            item => item.status === "Perlu Periksa"
-        ).length;
+        document.querySelectorAll(".delete-btn").forEach(btn => {
+            btn.addEventListener("click", (e) => deleteSingleEquipment(e.target.dataset.id));
+        });
+    }
 
-    const critical =
-        equipment.filter(
-            item => item.status === "Kritis"
-        ).length;
+    // MODAL DETAIL & EDIT STATUS
+    const detailModal = document.getElementById("detailModal");
+    function openDetailModal(id) {
+        const item = equipmentData.find(eq => eq.id === id);
+        if (!item) return;
 
-    document.getElementById("totalEquipment")
-        .textContent = total;
+        activeItemId = id;
+        document.getElementById("dtId").textContent = item.id;
+        document.getElementById("dtName").textContent = item.name;
+        document.getElementById("dtCategory").textContent = item.category;
+        document.getElementById("dtRoom").textContent = item.room;
 
-    document.getElementById("goodEquipment")
-        .textContent = good;
+        // Set pilihan dropdown status sesuai status alat saat ini
+        const statusSelect = document.getElementById("dtStatusSelect");
+        if (statusSelect) {
+            statusSelect.value = item.status;
+        }
 
-    document.getElementById("checkEquipment")
-        .textContent = check;
+        detailModal.style.display = "flex";
+    }
 
-    document.getElementById("criticalEquipment")
-        .textContent = critical;
-}
+    // MENYIMPAN PERUBAHAN STATUS
+    const saveStatusBtn = document.getElementById("saveStatusBtn");
+    if (saveStatusBtn) {
+        saveStatusBtn.onclick = () => {
+            if (!activeItemId) return;
 
+            const newStatus = document.getElementById("dtStatusSelect").value;
+            const targetItem = equipmentData.find(item => item.id === activeItemId);
 
-/* =========================
-   DETAIL
-========================= */
+            if (targetItem) {
+                targetItem.status = newStatus;
+                saveEquipmentData(equipmentData);
+                renderTable();
+                detailModal.style.display = "none";
+            }
+        };
+    }
 
-function showDetail(id) {
-    window.location.href = `detail.html?id=${id}`;
-}
+    if (document.getElementById("closeDetailModal")) document.getElementById("closeDetailModal").onclick = () => detailModal.style.display = "none";
+    if (document.getElementById("cancelDetailModal")) document.getElementById("cancelDetailModal").onclick = () => detailModal.style.display = "none";
 
+    // HAPUS SATU ALAT
+    function deleteSingleEquipment(id) {
+        equipmentData = equipmentData.filter(item => item.id !== id);
+        saveEquipmentData(equipmentData);
+        renderTable();
+        if (detailModal) detailModal.style.display = "none";
+    }
 
-/* =========================
-   RESET FILTER
-========================= */
+    if (document.getElementById("deleteOneBtn")) {
+        document.getElementById("deleteOneBtn").onclick = () => {
+            if (activeItemId) deleteSingleEquipment(activeItemId);
+        };
+    }
 
-resetFilter.addEventListener("click", () => {
+    // HAPUS SEMUA ALAT
+    const deleteAllModal = document.getElementById("confirmDeleteAllModal");
+    if (document.getElementById("deleteAllEquipment")) {
+        document.getElementById("deleteAllEquipment").onclick = () => deleteAllModal.style.display = "flex";
+    }
+    if (document.getElementById("closeConfirmDeleteAll")) {
+        document.getElementById("closeConfirmDeleteAll").onclick = () => deleteAllModal.style.display = "none";
+    }
+    if (document.getElementById("cancelDeleteAll")) {
+        document.getElementById("cancelDeleteAll").onclick = () => deleteAllModal.style.display = "none";
+    }
+    if (document.getElementById("confirmDeleteAllBtn")) {
+        document.getElementById("confirmDeleteAllBtn").onclick = () => {
+            equipmentData = [];
+            saveEquipmentData(equipmentData);
+            renderTable();
+            deleteAllModal.style.display = "none";
+        };
+    }
 
-    searchInput.value = "";
+    // TAMBAH ALAT BARU
+    const addModal = document.getElementById("addModal");
+    if (document.getElementById("addEquipmentBtn")) {
+        document.getElementById("addEquipmentBtn").onclick = () => addModal.style.display = "flex";
+    }
+    if (document.getElementById("closeAddModal")) {
+        document.getElementById("closeAddModal").onclick = () => addModal.style.display = "none";
+    }
+    if (document.getElementById("cancelAddModal")) {
+        document.getElementById("cancelAddModal").onclick = () => addModal.style.display = "none";
+    }
 
-    categoryFilter.value = "all";
+    if (document.getElementById("addForm")) {
+        document.getElementById("addForm").onsubmit = (e) => {
+            e.preventDefault();
+            
+            const uniqueId = `ALT-${Math.floor(1000 + Math.random() * 9000)}`;
 
-    statusFilter.value = "all";
+            const newItem = {
+                id: uniqueId,
+                name: document.getElementById("eqName").value,
+                category: document.getElementById("eqCategory").value,
+                room: document.getElementById("eqRoom").value,
+                status: document.getElementById("eqStatus").value
+            };
 
-    filterEquipment();
+            equipmentData.push(newItem);
+            saveEquipmentData(equipmentData);
+            renderTable();
+            
+            addModal.style.display = "none";
+            document.getElementById("addForm").reset();
+        };
+    }
+
+    if (searchInput) searchInput.oninput = renderTable;
+    if (statusFilter) statusFilter.onchange = renderTable;
+
+    renderTable();
 });
-
-
-/* =========================
-   EVENT SEARCH
-========================= */
-
-searchInput.addEventListener(
-    "input",
-    filterEquipment
-);
-
-categoryFilter.addEventListener(
-    "change",
-    filterEquipment
-);
-
-statusFilter.addEventListener(
-    "change",
-    filterEquipment
-);
-
-
-/* =========================
-   TAMBAH ALAT
-========================= */
-
-document
-    .getElementById("addEquipment")
-    .addEventListener("click", () => {
-
-        alert(
-            "Fitur Tambah Alat\n\n" +
-            "Fitur ini akan dikembangkan " +
-            "pada tahap berikutnya."
-        );
-
-    });
-
-
-/* =========================
-   NAVIGATION PLACEHOLDER
-========================= */
-
-document
-    .getElementById("maintenanceLink")
-    .addEventListener("click", event => {
-
-        event.preventDefault();
-
-        alert(
-            "Halaman Maintenance akan " +
-            "dibuat pada tahap berikutnya."
-        );
-
-    });
-
-
-document
-    .getElementById("simulationLink")
-    .addEventListener("click", event => {
-
-        event.preventDefault();
-
-        alert(
-            "Halaman Simulasi akan " +
-            "dibuat pada tahap berikutnya."
-        );
-
-    });
-
-
-document
-    .getElementById("settingsLink")
-    .addEventListener("click", event => {
-
-        event.preventDefault();
-
-        alert(
-            "Pengaturan belum tersedia " +
-            "pada prototype."
-        );
-
-    });
-
-
-/* =========================
-   MOBILE SIDEBAR
-========================= */
-
-const mobileMenu =
-    document.getElementById("mobileMenu");
-
-const sidebar =
-    document.getElementById("sidebar");
-
-mobileMenu.addEventListener("click", () => {
-
-    sidebar.classList.toggle("open");
-
-});
-
-
-/* =========================
-   INITIALIZE
-========================= */
-
-updateSummary();
-
-renderEquipment(equipment);

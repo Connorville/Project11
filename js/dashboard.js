@@ -1,363 +1,95 @@
-// ========================================
-// DATA ALAT MEDIS
-// ========================================
+document.addEventListener("DOMContentLoaded", () => {
+    const mockEquipmentData = [
+        { id: "ALT-2026-001", name: "Patient Monitor", category: "Diagnostik", room: "ICU Utama", status: "Baik" },
+        { id: "ALT-2026-002", name: "Ventilator", category: "Pendukung Kehidupan", room: "ICU Ruang 2", status: "Perlu Perbaikan" },
+        { id: "ALT-2026-003", name: "ECG Machine", category: "Diagnostik", room: "Poli Jantung", status: "Baik" },
+        { id: "ALT-2026-004", name: "Infusion Pump", category: "Pendukung Kehidupan", room: "Rawat Inap 3", status: "Baik" },
+        { id: "ALT-2026-005", name: "Pulse Oximeter", category: "Diagnostik", room: "UGD", status: "Rusak" }
+    ];
 
-const equipment = [
-    {
-        id: "MD-2026-001",
-        name: "Patient Monitor",
-        type: "Diagnostik",
-        usage: 128,
-        battery: 87,
-        calibration: 12,
-        score: 94,
-        status: "Baik"
-    },
-
-    {
-        id: "MD-2026-002",
-        name: "Ventilator",
-        type: "Pendukung Kehidupan",
-        usage: 245,
-        battery: 62,
-        calibration: 35,
-        score: 76,
-        status: "Perlu Periksa"
-    },
-
-    {
-        id: "MD-2026-003",
-        name: "ECG Machine",
-        type: "Diagnostik",
-        usage: 87,
-        battery: 91,
-        calibration: 8,
-        score: 97,
-        status: "Baik"
-    },
-
-    {
-        id: "MD-2026-004",
-        name: "Infusion Pump",
-        type: "Pendukung Kehidupan",
-        usage: 312,
-        battery: 44,
-        calibration: 58,
-        score: 61,
-        status: "Kritis"
-    },
-
-    {
-        id: "MD-2026-005",
-        name: "Pulse Oximeter",
-        type: "Diagnostik",
-        usage: 174,
-        battery: 78,
-        calibration: 20,
-        score: 89,
-        status: "Baik"
-    }
-];
-
-
-// ========================================
-// AKTIVITAS
-// ========================================
-
-const activities = [
-    {
-        icon: "✓",
-        title: "Patient Monitor diperiksa",
-        description: "Kondisi alat diperbarui",
-        time: "10 menit lalu"
-    },
-
-    {
-        icon: "↻",
-        title: "Ventilator digunakan",
-        description: "Jumlah penggunaan bertambah",
-        time: "32 menit lalu"
-    },
-
-    {
-        icon: "!",
-        title: "Infusion Pump membutuhkan perhatian",
-        description: "Skor kondisi berada di bawah batas aman",
-        time: "1 jam lalu"
-    },
-
-    {
-        icon: "✓",
-        title: "ECG Machine dikalibrasi",
-        description: "Kalibrasi berhasil dicatat",
-        time: "2 jam lalu"
-    }
-];
-
-
-// ========================================
-// STATISTIK
-// ========================================
-
-function updateStatistics() {
-
-    const total = equipment.length;
-
-    const good = equipment.filter(
-        item => item.status === "Baik"
-    ).length;
-
-    const inspection = equipment.filter(
-        item => item.status === "Perlu Periksa"
-    ).length;
-
-    const critical = equipment.filter(
-        item => item.status === "Kritis"
-    ).length;
-
-
-    document.getElementById("totalEquipment").textContent = total;
-
-    document.getElementById("goodEquipment").textContent = good;
-
-    document.getElementById("inspectionEquipment").textContent = inspection;
-
-    document.getElementById("criticalEquipment").textContent = critical;
-
-
-    const goodPercentage = Math.round((good / total) * 100);
-
-    const inspectionPercentage =
-        Math.round((inspection / total) * 100);
-
-    const criticalPercentage =
-        Math.round((critical / total) * 100);
-
-
-    document.getElementById("conditionPercentage").textContent =
-        goodPercentage + "%";
-
-    document.getElementById("goodPercentage").textContent =
-        goodPercentage + "%";
-
-    document.getElementById("inspectionPercentage").textContent =
-        inspectionPercentage + "%";
-
-    document.getElementById("criticalPercentage").textContent =
-        criticalPercentage + "%";
-}
-
-
-// ========================================
-// TABEL ALAT
-// ========================================
-
-function renderEquipment(data = equipment) {
-
-    const table = document.getElementById("equipmentTable");
-
-    table.innerHTML = "";
-
-
-    data.forEach(item => {
-
-        let statusClass = "good";
-
-        if (item.status === "Perlu Periksa") {
-            statusClass = "warning";
+    function getEquipmentData() {
+        const saved = localStorage.getItem("mediTrack_equipmentData");
+        if (saved !== null) {
+            return JSON.parse(saved);
         }
+        localStorage.setItem("mediTrack_equipmentData", JSON.stringify(mockEquipmentData));
+        return mockEquipmentData;
+    }
 
-        if (item.status === "Kritis") {
-            statusClass = "critical";
+    function saveEquipmentData(data) {
+        localStorage.setItem("mediTrack_equipmentData", JSON.stringify(data));
+    }
+
+    let equipmentData = getEquipmentData();
+    let activeDashId = null;
+
+    function renderDashboard() {
+        equipmentData = getEquipmentData();
+
+        // Update Kartu Statistik
+        document.getElementById("dashTotalEq").textContent = equipmentData.length;
+        document.getElementById("dashGoodEq").textContent = equipmentData.filter(i => i.status === "Baik").length;
+        document.getElementById("dashWarnEq").textContent = equipmentData.filter(i => i.status === "Perlu Perbaikan").length;
+        document.getElementById("dashDangerEq").textContent = equipmentData.filter(i => i.status === "Rusak").length;
+
+        const table = document.getElementById("dashEquipmentTable");
+        table.innerHTML = "";
+
+        // Menampilkan 5 data paling baru
+        const recentItems = [...equipmentData].reverse().slice(0, 5);
+
+        recentItems.forEach(item => {
+            let statusClass = "status-good";
+            if (item.status === "Perlu Perbaikan") statusClass = "status-warning";
+            if (item.status === "Rusak") statusClass = "status-danger";
+
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td>${item.id}</td>
+                <td><strong>${item.name}</strong></td>
+                <td>${item.room}</td>
+                <td><span class="status ${statusClass}">${item.status}</span></td>
+                <td>
+                    <button class="btn-action dash-view-btn" data-id="${item.id}">Detail</button>
+                </td>
+            `;
+            table.appendChild(row);
+        });
+
+        document.querySelectorAll(".dash-view-btn").forEach(btn => {
+            btn.addEventListener("click", (e) => openDashModal(e.target.dataset.id));
+        });
+    }
+
+    // Modal Detail Ringkas di Dashboard
+    const modal = document.getElementById("dashDetailModal");
+    function openDashModal(id) {
+        const item = equipmentData.find(eq => eq.id === id);
+        if (!item) return;
+
+        activeDashId = id;
+        document.getElementById("dDashId").textContent = item.id;
+        document.getElementById("dDashName").textContent = item.name;
+        document.getElementById("dDashRoom").textContent = item.room;
+        
+        const st = document.getElementById("dDashStatus");
+        st.textContent = item.status;
+        st.className = "status " + (item.status === "Baik" ? "status-good" : item.status === "Perlu Perbaikan" ? "status-warning" : "status-danger");
+
+        modal.style.display = "flex";
+    }
+
+    document.getElementById("closeDashDetail").onclick = () => modal.style.display = "none";
+    document.getElementById("cancelDashDetail").onclick = () => modal.style.display = "none";
+
+    document.getElementById("dashDeleteOneBtn").onclick = () => {
+        if (activeDashId) {
+            equipmentData = equipmentData.filter(i => i.id !== activeDashId);
+            saveEquipmentData(equipmentData);
+            renderDashboard();
+            modal.style.display = "none";
         }
+    };
 
-
-        const row = document.createElement("tr");
-
-        row.innerHTML = `
-            <td>${item.id}</td>
-
-            <td>
-                <strong>${item.name}</strong>
-            </td>
-
-            <td>
-                <span class="type-badge">
-                    ${item.type}
-                </span>
-            </td>
-
-            <td>
-                ${item.usage} kali
-            </td>
-
-            <td>
-                ${item.battery}%
-            </td>
-
-            <td>
-                <span class="score ${statusClass}">
-                    ${item.score}
-                </span>
-            </td>
-
-            <td>
-                <span class="status-badge ${statusClass}">
-                    ${item.status}
-                </span>
-            </td>
-
-            <td>
-                <button
-                    class="detail-button"
-                    onclick="showDetail('${item.id}')"
-                >
-                    Detail →
-                </button>
-            </td>
-        `;
-
-        table.appendChild(row);
-    });
-}
-
-
-// ========================================
-// AKTIVITAS
-// ========================================
-
-function renderActivities() {
-
-    const activityList =
-        document.getElementById("activityList");
-
-    activityList.innerHTML = "";
-
-
-    activities.forEach(activity => {
-
-        const item = document.createElement("div");
-
-        item.className = "activity-item";
-
-        item.innerHTML = `
-            <div class="activity-icon">
-                ${activity.icon}
-            </div>
-
-            <div class="activity-text">
-                <strong>
-                    ${activity.title}
-                </strong>
-
-                <span>
-                    ${activity.description}
-                </span>
-            </div>
-
-            <span class="activity-time">
-                ${activity.time}
-            </span>
-        `;
-
-        activityList.appendChild(item);
-    });
-}
-
-
-// ========================================
-// SEARCH
-// ========================================
-
-const searchInput =
-    document.getElementById("searchEquipment");
-
-
-searchInput.addEventListener("input", function () {
-
-    const keyword =
-        this.value.toLowerCase().trim();
-
-
-    const filteredEquipment = equipment.filter(item =>
-
-        item.id.toLowerCase().includes(keyword) ||
-
-        item.name.toLowerCase().includes(keyword) ||
-
-        item.type.toLowerCase().includes(keyword) ||
-
-        item.status.toLowerCase().includes(keyword)
-
-    );
-
-
-    renderEquipment(filteredEquipment);
+    renderDashboard();
 });
-
-
-// ========================================
-// DETAIL ALAT
-// ========================================
-
-function showDetail(Id) {
-    window.location.href = `detail.html?id=${Id}`;
-}
-
-// ========================================
-// TAMBAH ALAT
-// ========================================
-
-document
-    .getElementById("addEquipmentButton")
-    .addEventListener("click", function () {
-
-        alert(
-            "Form Tambah Alat akan dibuat pada tahap berikutnya."
-        );
-
-    });
-
-
-// ========================================
-// FILTER
-// ========================================
-
-document
-    .getElementById("filterButton")
-    .addEventListener("click", function () {
-
-        alert(
-            "Fitur filter akan digunakan untuk menyaring alat berdasarkan jenis dan status."
-        );
-
-    });
-
-
-// ========================================
-// MOBILE SIDEBAR
-// ========================================
-
-const mobileMenu =
-    document.getElementById("mobileMenu");
-
-const sidebar =
-    document.getElementById("sidebar");
-
-
-mobileMenu.addEventListener("click", function () {
-
-    sidebar.classList.toggle("show");
-
-});
-
-
-// ========================================
-// INITIALIZATION
-// ========================================
-
-updateStatistics();
-
-renderEquipment();
-
-renderActivities();

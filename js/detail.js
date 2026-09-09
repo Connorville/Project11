@@ -1,368 +1,91 @@
-// ===============================
-// DATA ALAT
-// ===============================
+document.addEventListener("DOMContentLoaded", () => {
+    // 1. Ambil ID Alat dari Parameter URL (?id=ALT-2026-001)
+    const params = new URLSearchParams(window.location.search);
+    const equipmentId = params.get("id");
 
-const equipment = [
-    {
-        id: "MD-2026-001",
-        name: "Patient Monitor",
-        type: "Diagnostik",
-        usage: 128,
-        battery: 87,
-        calibration: 12,
-        score: 94,
-        status: "Baik"
-    },
-    {
-        id: "MD-2026-002",
-        name: "Ventilator",
-        type: "Pendukung Kehidupan",
-        usage: 245,
-        battery: 62,
-        calibration: 35,
-        score: 76,
-        status: "Perlu Periksa"
-    },
-    {
-        id: "MD-2026-003",
-        name: "ECG Machine",
-        type: "Diagnostik",
-        usage: 87,
-        battery: 91,
-        calibration: 8,
-        score: 97,
-        status: "Baik"
-    },
-    {
-        id: "MD-2026-004",
-        name: "Infusion Pump",
-        type: "Pendukung Kehidupan",
-        usage: 312,
-        battery: 44,
-        calibration: 58,
-        score: 61,
-        status: "Kritis"
-    },
-    {
-        id: "MD-2026-005",
-        name: "Pulse Oximeter",
-        type: "Diagnostik",
-        usage: 174,
-        battery: 78,
-        calibration: 20,
-        score: 89,
-        status: "Baik"
-    }
-];
+    // 2. Ambil Data dari LocalStorage
+    const savedData = localStorage.getItem("mediTrack_equipmentData");
+    const equipmentList = savedData ? JSON.parse(savedData) : [];
 
+    // Cari alat berdasarkan ID
+    const item = equipmentList.find(eq => eq.id === equipmentId);
 
-// ===============================
-// AMBIL ID DARI URL
-// Contoh:
-// equipment-detail.html?id=MD-2026-001
-// ===============================
-
-const params = new URLSearchParams(window.location.search);
-
-const equipmentId = params.get("id") || "MD-2026-001";
-
-const selectedEquipment = equipment.find(
-    item => item.id === equipmentId
-);
-
-
-// ===============================
-// ELEMENT
-// ===============================
-
-const equipmentName = document.getElementById("equipmentName");
-const equipmentIdElement = document.getElementById("equipmentId");
-const equipmentType = document.getElementById("equipmentType");
-const equipmentStatus = document.getElementById("equipmentStatus");
-
-const breadcrumbName = document.getElementById("breadcrumbName");
-
-const scoreValue = document.getElementById("scoreValue");
-const batteryValue = document.getElementById("batteryValue");
-const usageValue = document.getElementById("usageValue");
-const calibrationValue = document.getElementById("calibrationValue");
-
-const circleScore = document.getElementById("circleScore");
-const scorePercent = document.getElementById("scorePercent");
-const scoreProgress = document.getElementById("scoreProgress");
-
-const conditionTitle = document.getElementById("conditionTitle");
-const conditionDescription = document.getElementById("conditionDescription");
-
-const infoName = document.getElementById("infoName");
-const infoId = document.getElementById("infoId");
-const infoCategory = document.getElementById("infoCategory");
-const infoStatus = document.getElementById("infoStatus");
-const infoUsage = document.getElementById("infoUsage");
-
-const maintenanceDate = document.getElementById("maintenanceDate");
-const maintenanceText = document.getElementById("maintenanceText");
-
-
-// ===============================
-// TAMPILKAN DATA
-// ===============================
-
-function renderEquipment() {
-
-    if (!selectedEquipment) {
-        document.title = "Alat Tidak Ditemukan | MediTrackPRO";
-
-        equipmentName.textContent = "Alat Tidak Ditemukan";
-        equipmentIdElement.textContent = "-";
-        equipmentType.textContent = "-";
-
-        equipmentStatus.textContent = "Tidak ditemukan";
-
-        conditionTitle.textContent = "Data tidak tersedia";
-        conditionDescription.textContent =
-            "Data alat yang dipilih tidak ditemukan.";
-
+    // 3. Jika Data Tidak Ditemukan
+    if (!item) {
+        document.getElementById("equipmentName").textContent = "Alat Tidak Ditemukan";
+        document.getElementById("conditionTitle").textContent = "Data Tidak Ada";
+        document.getElementById("conditionDescription").textContent = "Silakan kembali ke daftar alat dan pilih perangkat yang valid.";
         return;
     }
 
+    // 4. Generate Nilai Default (Baterai, Score, Jam) Jika Belum Ada di Data
+    const battery = item.battery !== undefined ? item.battery : 85;
+    const usage = item.usage !== undefined ? item.usage : 120;
+    
+    // Kalkulasi Skor Otomatis Berdasarkan Status
+    let score = 95;
+    if (item.status === "Perlu Perbaikan") score = 65;
+    if (item.status === "Rusak") score = 30;
 
-    // Header
-    equipmentName.textContent = selectedEquipment.name;
-    equipmentIdElement.textContent = selectedEquipment.id;
-    equipmentType.textContent = selectedEquipment.type;
+    // 5. Render Data ke Tampilan
+    document.title = `${item.name} | MediTrackPRO`;
 
-    breadcrumbName.textContent = selectedEquipment.name;
+    // Header & Breadcrumb
+    document.getElementById("breadcrumbName").textContent = item.name;
+    document.getElementById("equipmentName").textContent = item.name;
+    document.getElementById("equipmentId").textContent = item.id;
+    document.getElementById("equipmentType").textContent = item.category || "Medis";
 
-    document.title =
-        `${selectedEquipment.name} | MediTrackPRO`;
+    // Status Badge
+    const statusBadge = document.getElementById("equipmentStatus");
+    statusBadge.textContent = item.status;
+    statusBadge.className = "status-badge"; // Reset class
+    if (item.status === "Perlu Perbaikan") statusBadge.classList.add("status-warning");
+    if (item.status === "Rusak") statusBadge.classList.add("status-critical");
 
+    // Stat Cards
+    document.getElementById("scoreValue").textContent = `${score}%`;
+    document.getElementById("batteryValue").textContent = `${battery}%`;
+    document.getElementById("usageValue").textContent = `${usage} jam`;
+    document.getElementById("roomValue").textContent = item.room || "-";
 
-    // Status
-    equipmentStatus.textContent =
-        selectedEquipment.status;
+    // Circular Score & Progress Bar
+    document.getElementById("circleScore").textContent = score;
+    document.getElementById("scorePercent").textContent = `${score}%`;
+    document.getElementById("scoreProgress").style.width = `${score}%`;
 
-    infoStatus.textContent =
-        selectedEquipment.status;
+    // Descriptions
+    const condTitle = document.getElementById("conditionTitle");
+    const condDesc = document.getElementById("conditionDescription");
 
-
-    // Tambahkan class status
-    equipmentStatus.classList.remove(
-        "status-warning",
-        "status-critical"
-    );
-
-    if (selectedEquipment.status === "Perlu Periksa") {
-        equipmentStatus.classList.add("status-warning");
-    }
-
-    if (selectedEquipment.status === "Kritis") {
-        equipmentStatus.classList.add("status-critical");
-    }
-
-
-    // Statistics
-    scoreValue.textContent =
-        `${selectedEquipment.score}%`;
-
-    batteryValue.textContent =
-        `${selectedEquipment.battery}%`;
-
-    usageValue.textContent =
-        `${selectedEquipment.usage} jam`;
-
-    calibrationValue.textContent =
-        `${selectedEquipment.calibration} hari`;
-
-
-    // Score
-    circleScore.textContent =
-        selectedEquipment.score;
-
-    scorePercent.textContent =
-        `${selectedEquipment.score}%`;
-
-    scoreProgress.style.width =
-        `${selectedEquipment.score}%`;
-
-
-    // Condition
-    updateCondition();
-
-
-    // Information
-    infoName.textContent =
-        selectedEquipment.name;
-
-    infoId.textContent =
-        selectedEquipment.id;
-
-    infoCategory.textContent =
-        selectedEquipment.type;
-
-    infoUsage.textContent =
-        `${selectedEquipment.usage} jam`;
-
-
-    // Maintenance
-    updateMaintenance();
-}
-
-
-// ===============================
-// UPDATE CONDITION
-// ===============================
-
-function updateCondition() {
-
-    if (selectedEquipment.status === "Baik") {
-
-        conditionTitle.textContent = "Kondisi Baik";
-
-        conditionDescription.textContent =
-            "Alat dalam kondisi baik dan dapat digunakan untuk operasional.";
-
-    } else if (selectedEquipment.status === "Perlu Periksa") {
-
-        conditionTitle.textContent = "Perlu Pemeriksaan";
-
-        conditionDescription.textContent =
-            "Alat masih dapat digunakan, tetapi disarankan melakukan pemeriksaan.";
-
+    if (item.status === "Baik") {
+        condTitle.textContent = "Kondisi Optimal";
+        condDesc.textContent = "Perangkat dalam kondisi siap pakai dan berfungsi sesuai standar operasional.";
+    } else if (item.status === "Perlu Perbaikan") {
+        condTitle.textContent = "Perlu Perawatan";
+        condDesc.textContent = "Perangkat memerlukan perbaikan ringan atau kalibrasi sebelum digunakan kembali.";
     } else {
-
-        conditionTitle.textContent = "Kondisi Kritis";
-
-        conditionDescription.textContent =
-            "Alat membutuhkan pemeriksaan segera sebelum digunakan kembali.";
+        condTitle.textContent = "Kondisi Kritis / Rusak";
+        condDesc.textContent = "Perangkat mengalami kerusakan dan tidak aman untuk digunakan pada pasien.";
     }
-}
 
+    // Table Information Card
+    document.getElementById("infoName").textContent = item.name;
+    document.getElementById("infoId").textContent = item.id;
+    document.getElementById("infoCategory").textContent = item.category || "Medis";
+    document.getElementById("infoRoom").textContent = item.room || "-";
+    document.getElementById("infoStatus").textContent = item.status;
+    document.getElementById("infoUsage").textContent = `${usage} jam`;
 
-// ===============================
-// UPDATE MAINTENANCE
-// ===============================
-
-function updateMaintenance() {
-
-    const days = selectedEquipment.calibration;
-
-    const date = new Date();
-
-    date.setDate(date.getDate() + days);
-
-    const options = {
-        day: "numeric",
-        month: "long",
-        year: "numeric"
+    // Event Kembali
+    document.getElementById("backButton").onclick = () => {
+        window.location.href = "equipment.html";
     };
 
-    maintenanceDate.textContent =
-        date.toLocaleDateString("id-ID", options);
-
-    maintenanceText.textContent =
-        `${days} hari lagi`;
-}
-
-
-// ===============================
-// BACK BUTTON
-// ===============================
-
-document.getElementById("backButton").addEventListener(
-    "click",
-    () => {
-        window.location.href = "equipment.html";
+    // Responsive Sidebar Mobile
+    const menuBtn = document.getElementById("menuButton");
+    const sidebar = document.getElementById("sidebar");
+    if (menuBtn && sidebar) {
+        menuBtn.onclick = () => sidebar.classList.toggle("show");
     }
-);
-
-
-// ===============================
-// MAINTENANCE BUTTON
-// ===============================
-
-document.getElementById("maintenanceButton").addEventListener(
-    "click",
-    () => {
-        window.location.href = "maintenance.html";
-    }
-);
-
-
-// ===============================
-// SIMULATION
-// ===============================
-
-document.getElementById("simulationButton").addEventListener(
-    "click",
-    () => {
-
-        alert(
-            `Simulasi ${selectedEquipment.name}\n\n` +
-            "Fitur simulasi penggunaan akan dikembangkan pada tahap berikutnya."
-        );
-
-    }
-);
-
-
-// ===============================
-// SIDEBAR MOBILE
-// ===============================
-
-const menuButton =
-    document.getElementById("menuButton");
-
-const sidebar =
-    document.getElementById("sidebar");
-
-menuButton.addEventListener("click", () => {
-    sidebar.classList.toggle("show");
 });
-
-
-// ===============================
-// PLACEHOLDER MENU
-// ===============================
-
-document.getElementById("maintenanceLink")
-    .addEventListener("click", (event) => {
-
-        event.preventDefault();
-
-        alert(
-            "Halaman Maintenance akan dibuat pada langkah berikutnya."
-        );
-
-    });
-
-
-document.getElementById("simulationLink")
-    .addEventListener("click", (event) => {
-
-        event.preventDefault();
-
-        alert(
-            "Halaman Simulasi akan dibuat pada langkah berikutnya."
-        );
-
-    });
-
-
-document.getElementById("settingsLink")
-    .addEventListener("click", (event) => {
-
-        event.preventDefault();
-
-        alert(
-            "Halaman Pengaturan akan dibuat pada langkah berikutnya."
-        );
-
-    });
-
-
-// ===============================
-// INIT
-// ===============================
-
-renderEquipment();

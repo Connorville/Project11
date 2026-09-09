@@ -1,387 +1,121 @@
-// ===============================
-// DATA MAINTENANCE
-// ===============================
-
-const maintenanceData = [
-
-    {
-        id: "MD-2026-001",
-        name: "Patient Monitor",
-        type: "Diagnostik",
-        date: "16 September 2026",
-        status: "Menunggu"
-    },
-
-    {
-        id: "MD-2026-002",
-        name: "Ventilator",
-        type: "Pendukung Kehidupan",
-        date: "9 Oktober 2026",
-        status: "Dalam Proses"
-    },
-
-    {
-        id: "MD-2026-003",
-        name: "ECG Machine",
-        type: "Diagnostik",
-        date: "12 September 2026",
-        status: "Selesai"
-    },
-
-    {
-        id: "MD-2026-004",
-        name: "Infusion Pump",
-        type: "Pendukung Kehidupan",
-        date: "2 November 2026",
-        status: "Menunggu"
-    },
-
-    {
-        id: "MD-2026-005",
-        name: "Pulse Oximeter",
-        type: "Diagnostik",
-        date: "29 September 2026",
-        status: "Selesai"
-    }
-
+// Data Default jika localStorage belum terisi
+const defaultEquipmentData = [
+    { id: "ALT-2026-001", name: "Patient Monitor", category: "Diagnostik", room: "ICU Utama", status: "Baik" },
+    { id: "ALT-2026-002", name: "Ventilator", category: "Pendukung Kehidupan", room: "ICU Ruang 2", status: "Perlu Perbaikan" },
+    { id: "ALT-2026-003", name: "ECG Machine", category: "Diagnostik", room: "Poli Jantung", status: "Baik" },
+    { id: "ALT-2026-004", name: "Infusion Pump", category: "Pendukung Kehidupan", room: "Rawat Inap 3", status: "Baik" },
+    { id: "ALT-2026-005", name: "Pulse Oximeter", category: "Diagnostik", room: "UGD", status: "Rusak" }
 ];
 
+function getEquipmentData() {
+    const saved = localStorage.getItem("mediTrack_equipmentData");
+    if (saved !== null) {
+        return JSON.parse(saved);
+    }
+    localStorage.setItem("mediTrack_equipmentData", JSON.stringify(defaultEquipmentData));
+    return defaultEquipmentData;
+}
 
-// ===============================
-// ELEMENT
-// ===============================
+function saveEquipmentData(data) {
+    localStorage.setItem("mediTrack_equipmentData", JSON.stringify(data));
+}
 
-const table =
-    document.getElementById("maintenanceTable");
+document.addEventListener("DOMContentLoaded", () => {
+    let equipmentData = getEquipmentData();
+    let activeMaintId = null;
 
-const emptyState =
-    document.getElementById("emptyState");
+    const table = document.getElementById("maintenanceTable");
+    const emptyState = document.getElementById("maintEmptyState");
+    const resultCount = document.getElementById("maintResultCount");
+    const maintModal = document.getElementById("maintModal");
 
-const searchInput =
-    document.getElementById("searchInput");
+    // Menampilkan hanya alat bernilai "Perlu Perbaikan" atau "Rusak"
+    function renderMaintenanceTable() {
+        equipmentData = getEquipmentData();
 
-const statusFilter =
-    document.getElementById("statusFilter");
+        const maintenanceItems = equipmentData.filter(
+            item => item.status === "Perlu Perbaikan" || item.status === "Rusak"
+        );
 
-const resultCount =
-    document.getElementById("resultCount");
+        // Update ringkasan kartu
+        const warnCount = maintenanceItems.filter(i => i.status === "Perlu Perbaikan").length;
+        const dangerCount = maintenanceItems.filter(i => i.status === "Rusak").length;
 
+        if (document.getElementById("maintWarnCount")) document.getElementById("maintWarnCount").textContent = warnCount;
+        if (document.getElementById("maintDangerCount")) document.getElementById("maintDangerCount").textContent = dangerCount;
+        if (document.getElementById("maintTotalCount")) document.getElementById("maintTotalCount").textContent = maintenanceItems.length;
 
-// ===============================
-// RENDER TABLE
-// ===============================
+        if (resultCount) resultCount.textContent = `${maintenanceItems.length} alat`;
 
-function renderMaintenance() {
+        table.innerHTML = "";
 
-    const search =
-        searchInput.value.toLowerCase();
+        if (maintenanceItems.length === 0) {
+            if (emptyState) emptyState.style.display = "block";
+            return;
+        } else {
+            if (emptyState) emptyState.style.display = "none";
+        }
 
-    const selectedStatus =
-        statusFilter.value;
+        maintenanceItems.forEach(item => {
+            let statusClass = item.status === "Perlu Perbaikan" ? "status-warning" : "status-danger";
 
-
-    const filteredData =
-        maintenanceData.filter(item => {
-
-            const matchesSearch =
-                item.name.toLowerCase().includes(search) ||
-                item.id.toLowerCase().includes(search);
-
-            const matchesStatus =
-                selectedStatus === "Semua" ||
-                item.status === selectedStatus;
-
-            return matchesSearch && matchesStatus;
-
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td>${item.id}</td>
+                <td><strong>${item.name}</strong></td>
+                <td>${item.room}</td>
+                <td><span class="status-badge ${statusClass}">${item.status}</span></td>
+                <td>
+                    <button class="btn-action view-btn edit-maint-btn" data-id="${item.id}">Update Status</button>
+                </td>
+            `;
+            table.appendChild(row);
         });
 
-
-    table.innerHTML = "";
-
-
-    filteredData.forEach(item => {
-
-        const row =
-            document.createElement("tr");
-
-        let statusClass = "status-pending";
-
-        if (item.status === "Dalam Proses") {
-            statusClass = "status-progress";
-        }
-
-        if (item.status === "Selesai") {
-            statusClass = "status-completed";
-        }
-
-
-        row.innerHTML = `
-
-            <td>${item.id}</td>
-
-            <td>
-                <span class="equipment-name">
-                    ${item.name}
-                </span>
-            </td>
-
-            <td>
-                <span class="equipment-type">
-                    ${item.type}
-                </span>
-            </td>
-
-            <td>
-                <span class="date">
-                    ${item.date}
-                </span>
-            </td>
-
-            <td>
-                <span class="status ${statusClass}">
-                    ${item.status}
-                </span>
-            </td>
-
-            <td>
-
-                <button
-                    class="action-button"
-                    onclick="handleMaintenance('${item.id}')"
-                >
-                    ${
-                        item.status === "Selesai"
-                        ? "Lihat"
-                        : "Proses"
-                    }
-                </button>
-
-            </td>
-
-        `;
-
-
-        table.appendChild(row);
-
-    });
-
-
-    resultCount.textContent =
-        `${filteredData.length} jadwal`;
-
-
-    if (filteredData.length === 0) {
-
-        emptyState.classList.add("show");
-
-    } else {
-
-        emptyState.classList.remove("show");
-
+        document.querySelectorAll(".edit-maint-btn").forEach(btn => {
+            btn.addEventListener("click", (e) => openMaintModal(e.target.dataset.id));
+        });
     }
 
-}
+    // Modal Buka & Edit Status
+    function openMaintModal(id) {
+        const item = equipmentData.find(eq => eq.id === id);
+        if (!item) return;
 
+        activeMaintId = id;
+        document.getElementById("maintDtId").textContent = item.id;
+        document.getElementById("maintDtName").textContent = item.name;
+        document.getElementById("maintDtRoom").textContent = item.room;
+        document.getElementById("maintStatusSelect").value = item.status;
 
-// ===============================
-// UPDATE STATISTICS
-// ===============================
-
-function updateStatistics() {
-
-    const total =
-        maintenanceData.length;
-
-    const pending =
-        maintenanceData.filter(
-            item => item.status === "Menunggu"
-        ).length;
-
-    const progress =
-        maintenanceData.filter(
-            item => item.status === "Dalam Proses"
-        ).length;
-
-    const completed =
-        maintenanceData.filter(
-            item => item.status === "Selesai"
-        ).length;
-
-
-    document.getElementById(
-        "totalMaintenance"
-    ).textContent = total;
-
-
-    document.getElementById(
-        "pendingMaintenance"
-    ).textContent = pending;
-
-
-    document.getElementById(
-        "progressMaintenance"
-    ).textContent = progress;
-
-
-    document.getElementById(
-        "completedMaintenance"
-    ).textContent = completed;
-
-}
-
-
-// ===============================
-// HANDLE MAINTENANCE
-// ===============================
-
-function handleMaintenance(id) {
-
-    const item =
-        maintenanceData.find(
-            equipment => equipment.id === id
-        );
-
-
-    if (!item) return;
-
-
-    if (item.status === "Selesai") {
-
-        alert(
-            `Maintenance ${item.name}\n\n` +
-            `Status: Selesai\n` +
-            `Tanggal: ${item.date}`
-        );
-
-        return;
+        maintModal.style.display = "flex";
     }
 
+    // Simpan Perubahan Status
+    const saveBtn = document.getElementById("saveMaintStatusBtn");
+    if (saveBtn) {
+        saveBtn.onclick = () => {
+            if (!activeMaintId) return;
 
-    const confirmProcess =
-        confirm(
-            `Mulai maintenance untuk ${item.name}?`
-        );
+            const newStatus = document.getElementById("maintStatusSelect").value;
+            const targetItem = equipmentData.find(item => item.id === activeMaintId);
 
-
-    if (!confirmProcess) return;
-
-
-    item.status = "Dalam Proses";
-
-
-    updateStatistics();
-
-    renderMaintenance();
-
-}
-
-
-// ===============================
-// SEARCH
-// ===============================
-
-searchInput.addEventListener(
-    "input",
-    renderMaintenance
-);
-
-
-// ===============================
-// FILTER
-// ===============================
-
-statusFilter.addEventListener(
-    "change",
-    renderMaintenance
-);
-
-
-// ===============================
-// ADD MAINTENANCE
-// ===============================
-
-document.getElementById(
-    "addMaintenance"
-).addEventListener(
-    "click",
-    () => {
-
-        alert(
-            "Fitur penjadwalan maintenance akan " +
-            "dikembangkan pada tahap berikutnya."
-        );
-
+            if (targetItem) {
+                targetItem.status = newStatus;
+                saveEquipmentData(equipmentData);
+                renderMaintenanceTable(); // Jika diubah jadi 'Baik', otomatis hilang dari tabel
+                maintModal.style.display = "none";
+            }
+        };
     }
-);
 
-
-// ===============================
-// SIDEBAR MOBILE
-// ===============================
-
-const menuButton =
-    document.getElementById("menuButton");
-
-const sidebar =
-    document.getElementById("sidebar");
-
-
-menuButton.addEventListener(
-    "click",
-    () => {
-
-        sidebar.classList.toggle("show");
-
+    // Event Tutup Modal
+    if (document.getElementById("closeMaintModal")) {
+        document.getElementById("closeMaintModal").onclick = () => maintModal.style.display = "none";
     }
-);
-
-
-// ===============================
-// SIMULATION
-// ===============================
-
-document.getElementById(
-    "simulationLink"
-).addEventListener(
-    "click",
-    event => {
-
-        event.preventDefault();
-
-        alert(
-            "Halaman Simulasi akan dibuat " +
-            "pada langkah berikutnya."
-        );
-
+    if (document.getElementById("cancelMaintModal")) {
+        document.getElementById("cancelMaintModal").onclick = () => maintModal.style.display = "none";
     }
-);
 
-
-// ===============================
-// SETTINGS
-// ===============================
-
-document.getElementById(
-    "settingsLink"
-).addEventListener(
-    "click",
-    event => {
-
-        event.preventDefault();
-
-        alert(
-            "Halaman Pengaturan akan dibuat " +
-            "pada tahap berikutnya."
-        );
-
-    }
-);
-
-
-// ===============================
-// INIT
-// ===============================
-
-updateStatistics();
-
-renderMaintenance();
+    renderMaintenanceTable();
+});
