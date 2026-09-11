@@ -12,7 +12,6 @@
 <body>
 
 <div class="app-layout">
-
     <!-- SIDEBAR -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
@@ -28,10 +27,9 @@
             <a href="dashboard.html" class="nav-item"><span>▦</span> Dashboard</a>
             <a href="equipment.html" class="nav-item active"><span>▣</span> Daftar Alat</a>
             <a href="maintenance.html" class="nav-item"><span>⚙</span> Maintenance</a>
-            
 
             <p class="nav-label">LAINNYA</p>
-            <a href="setting.html" class="nav-item" id="settingsLink"><span>⚙</span> Pengaturan</a>
+            <a href="setting.html" class="nav-item"><span>⚙</span> Pengaturan</a>
         </nav>
 
         <div class="sidebar-footer">
@@ -45,173 +43,139 @@
 
     <!-- MAIN CONTENT -->
     <main class="main-content">
-
         <!-- TOPBAR -->
         <header class="topbar">
             <button class="menu-button" id="menuButton">☰</button>
             <div class="page-title">
                 <span>Daftar Perangkat Medis</span>
-                <small>Kelola dan pantau seluruh inventaris alat</small>
+                <small>Kelola status dan informasi alat rumah sakit</small>
             </div>
             <div class="topbar-right">
                 <div class="notification">🔔<span class="notification-dot"></span></div>
-                <div class="top-avatar">A</div>
+                <div class="top-avatar" id="topAvatar">A</div>
             </div>
         </header>
 
         <!-- CONTENT -->
         <section class="content">
-
-            <!-- ACTION BAR / FILTER & SEARCH -->
-            <div class="action-bar">
-                <div class="search-box">
-                    <span class="search-icon">🔍</span>
-                    <input type="text" id="searchInput" placeholder="Cari nama alat, ID, atau ruangan...">
-                </div>
-
-                <div class="filter-group">
-                    <select id="statusFilter" class="filter-select">
-                        <option value="ALL">Semua Status</option>
-                        <option value="Baik">Baik</option>
-                        <option value="Perlu Perbaikan">Perlu Perbaikan</option>
-                        <option value="Rusak">Rusak</option>
-                    </select>
-
-                    <button class="btn btn-primary" id="addEquipmentBtn">+ Tambah Alat</button>
-                </div>
-            </div>
-
-            <!-- EQUIPMENT TABLE CARD -->
             <div class="card table-card">
+                <div style="padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; border-bottom: 1px solid var(--border-color);">
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap; flex: 1;">
+                        <input type="text" id="searchInput" placeholder="Cari nama, ID, atau lokasi..." style="padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 6px; outline: none; width: 240px;">
+                        <select id="statusFilter" style="padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 6px; outline: none;">
+                            <option value="ALL">Semua Status</option>
+                            <option value="Baik">Baik</option>
+                            <option value="Perlu Perbaikan">Perlu Perbaikan</option>
+                            <option value="Rusak">Rusak</option>
+                        </select>
+                    </div>
+                    <button id="addEquipmentBtn" class="btn-primary" style="padding: 8px 16px; background: var(--primary-color); color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer;">+ Tambah Alat</button>
+                </div>
+
                 <div class="table-responsive">
                     <table class="data-table">
                         <thead>
                             <tr>
                                 <th>ID Alat</th>
-                                <th>Nama Perangkat</th>
+                                <th>Nama Alat</th>
                                 <th>Kategori</th>
-                                <th>Ruangan</th>
-                                <th>Status</th>
+                                <th>Lokasi Ruangan</th>
+                                <th>Status Kondisi</th>
                                 <th style="text-align: center;">Aksi</th>
                             </tr>
                         </thead>
                         <tbody id="equipmentTableBody">
-                            <!-- Data di-render dinamis via JS -->
+                            <!-- Di-render via JavaScript -->
                         </tbody>
                     </table>
                 </div>
 
-                <!-- TABLE FOOTER -->
-                <div class="table-footer">
-                    <span class="table-info" id="tableInfo">Menampilkan 0 dari 0 alat</span>
+                <div style="padding: 12px 20px; color: #64748b; font-size: 13px; border-top: 1px solid var(--border-color);" id="tableInfo">
+                    Menampilkan data...
                 </div>
             </div>
-
         </section>
-
     </main>
-
 </div>
 
-<!-- MODAL TAMBAH ALAT -->
-<div class="modal-overlay" id="equipmentModal" style="display: none;">
-    <div class="modal-box">
-        <div class="modal-header">
-            <h3>Tambah Perangkat Medis</h3>
-            <button class="close-btn" id="closeModalBtn">&times;</button>
+<!-- MODAL TAMBAH ALAT BARU -->
+<div id="equipmentModal" class="modal-backdrop" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+    <div class="modal-card" style="background: white; border-radius: 12px; width: 100%; max-width: 480px; padding: 24px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <h3 style="margin: 0; font-size: 18px;">➕ Tambah Perangkat Medis</h3>
+            <button id="closeModalBtn" style="background: none; border: none; font-size: 20px; cursor: pointer;">&times;</button>
         </div>
         <form id="equipmentForm">
-            <div class="form-group">
-                <label for="inputName">Nama Alat</label>
-                <input type="text" id="inputName" required placeholder="Contoh: Patient Monitor">
+            <div style="margin-bottom: 12px;">
+                <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px;">Nama Perangkat</label>
+                <input type="text" id="inputName" required placeholder="Contoh: Defibrillator" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 6px; outline: none;">
             </div>
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="inputCategory">Kategori</label>
-                    <select id="inputCategory" required>
-                        <option value="Monitoring">Monitoring</option>
-                        <option value="Terapi & Bantuan Hidup">Terapi & Bantuan Hidup</option>
-                        <option value="Laboratorium">Laboratorium</option>
-                        <option value="Radiologi">Radiologi</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="inputRoom">Ruangan</label>
-                    <input type="text" id="inputRoom" required placeholder="Contoh: ICU - Bed 02">
-                </div>
+            <div style="margin-bottom: 12px;">
+                <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px;">Kategori Perangkat</label>
+                <select id="inputCategory" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 6px; outline: none;">
+                    <option value="Monitoring">Monitoring</option>
+                    <option value="Terapi & Bantuan Hidup">Terapi & Bantuan Hidup</option>
+                    <option value="Diagnostik">Diagnostik</option>
+                    <option value="Laboratorium">Laboratorium</option>
+                </select>
             </div>
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="inputStatus">Status Kondisi</label>
-                    <select id="inputStatus" required>
-                        <option value="Baik">Baik</option>
-                        <option value="Perlu Perbaikan">Perlu Perbaikan</option>
-                        <option value="Rusak">Rusak</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="inputUsage">Total Jam Penggunaan</label>
-                    <input type="number" id="inputUsage" min="0" placeholder="Contoh: 120">
-                </div>
+            <div style="margin-bottom: 12px;">
+                <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px;">Lokasi Ruangan</label>
+                <input type="text" id="inputRoom" required placeholder="Contoh: ICU Utama / UGD" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 6px; outline: none;">
             </div>
-
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" id="cancelModalBtn">Batal</button>
-                <button type="submit" class="btn btn-primary">Simpan Data</button>
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px;">Status Kondisi</label>
+                <select id="inputStatus" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 6px; outline: none;">
+                    <option value="Baik">Baik</option>
+                    <option value="Perlu Perbaikan">Perlu Perbaikan</option>
+                    <option value="Rusak">Rusak</option>
+                </select>
+            </div>
+            <div style="display: flex; justify-content: flex-end; gap: 8px;">
+                <button type="button" id="cancelModalBtn" style="padding: 8px 16px; border: 1px solid var(--border-color); background: white; border-radius: 6px; cursor: pointer;">Batal</button>
+                <button type="submit" style="padding: 8px 16px; background: var(--primary-color); color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer;">Simpan Perangkat</button>
             </div>
         </form>
     </div>
 </div>
 
-<!-- POP-UP MODAL DETAIL ALAT -->
-<div class="modal-overlay" id="detailModal" style="display: none;">
-    <div class="modal-box" style="max-width: 550px;">
-        <div class="modal-header">
-            <h3>Detail Perangkat Medis</h3>
-            <button class="close-btn" id="closeDetailModalBtn">&times;</button>
+<!-- MODAL POP-UP TIKET MAINTENANCE OTOMATIS -->
+<div id="maintenanceTicketModal" class="modal-backdrop" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+    <div class="modal-card" style="background: white; border-radius: 12px; width: 100%; max-width: 480px; padding: 24px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <h3 style="margin: 0; font-size: 18px;">🛠️ Buat Tiket Maintenance</h3>
+            <button id="closeMntModalBtn" style="background: none; border: none; font-size: 20px; cursor: pointer;">&times;</button>
         </div>
-        <div class="modal-body" style="padding: 15px 0;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; background: #f8fafc; padding: 12px; border-radius: 8px;">
-                <div>
-                    <h4 id="dtName" style="font-size: 16px; margin-bottom: 4px;">-</h4>
-                    <small id="dtId" style="color: #64748b;">-</small>
-                </div>
-                <span id="dtStatus" class="status-badge">-</span>
+        <p style="font-size: 13px; color: #64748b; margin-bottom: 16px;">
+            Status alat diubah. Silakan lengkapi detail masalah di bawah untuk dikirim ke tim Maintenance.
+        </p>
+        <form id="maintenanceTicketForm">
+            <input type="hidden" id="mntEqId">
+            <div style="margin-bottom: 12px;">
+                <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px;">Perangkat Medis</label>
+                <input type="text" id="mntEqName" readonly style="width: 100%; padding: 8px 12px; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 6px;">
             </div>
-
-            <!-- RINGKASAN METRIK (SKOR, BATERAI, JAM) -->
-            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px; text-align: center;">
-                <div style="background: #eff6ff; padding: 10px; border-radius: 8px;">
-                    <small style="color: #64748b; font-size: 11px;">Kondisi Score</small>
-                    <strong id="dtScore" style="display: block; font-size: 16px; color: #2563eb;">0%</strong>
-                </div>
-                <div style="background: #f0fdf4; padding: 10px; border-radius: 8px;">
-                    <small style="color: #64748b; font-size: 11px;">Sisa Baterai</small>
-                    <strong id="dtBattery" style="display: block; font-size: 16px; color: #16a34a;">0%</strong>
-                </div>
-                <div style="background: #fefce8; padding: 10px; border-radius: 8px;">
-                    <small style="color: #64748b; font-size: 11px;">Total Penggunaan</small>
-                    <strong id="dtUsage" style="display: block; font-size: 16px; color: #ca8a04;">0 jam</strong>
-                </div>
+            <div style="margin-bottom: 12px;">
+                <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px;">Lokasi Ruangan</label>
+                <input type="text" id="mntEqRoom" readonly style="width: 100%; padding: 8px 12px; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 6px;">
             </div>
-
-            <!-- SPESIFIKASI DETAIL -->
-            <div style="display: flex; flex-direction: column; gap: 8px; font-size: 13px;">
-                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #f1f5f9; padding-bottom: 6px;">
-                    <span style="color: #64748b;">Kategori:</span>
-                    <strong id="dtCategory">-</strong>
-                </div>
-                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #f1f5f9; padding-bottom: 6px;">
-                    <span style="color: #64748b;">Ruangan / Lokasi:</span>
-                    <strong id="dtRoom">-</strong>
-                </div>
+            <div style="margin-bottom: 12px;">
+                <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px;">Tingkat Prioritas</label>
+                <select id="mntPriority" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 6px; outline: none;">
+                    <option value="Sedang">Sedang</option>
+                    <option value="Tinggi">Tinggi</option>
+                    <option value="Darurat">Darurat</option>
+                </select>
             </div>
-        </div>
-        <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" id="cancelDetailModalBtn">Tutup</button>
-        </div>
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px;">Deskripsi / Keluhan Kerusakan</label>
+                <textarea id="mntIssue" required rows="3" placeholder="Contoh: Baterai cepat habis, layar sering flickering..." style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 6px; outline: none; resize: vertical;"></textarea>
+            </div>
+            <div style="display: flex; justify-content: flex-end; gap: 8px;">
+                <button type="button" id="cancelMntModalBtn" style="padding: 8px 16px; border: 1px solid var(--border-color); background: white; border-radius: 6px; cursor: pointer;">Batal</button>
+                <button type="submit" style="padding: 8px 16px; background: var(--primary-color); color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer;">Kirim Ke Maintenance</button>
+            </div>
+        </form>
     </div>
 </div>
 

@@ -1,177 +1,159 @@
-// Data Awal Mock untuk Maintenance
-const mockMaintenanceData = [
-    { id: "ALT-2026-002", name: "Ventilator", room: "ICU Ruang 2", type: "Perbaikan Total", priority: "Tinggi", status: "Menunggu Teknisi" },
-    { id: "ALT-2026-005", name: "Pulse Oximeter", room: "UGD", type: "Servis Berkala", priority: "Sedang", status: "Dalam Proses" }
-];
-
-function loadMaintenanceData() {
-    const saved = localStorage.getItem("mediTrack_maintenanceData");
-    if (saved !== null) {
-        return JSON.parse(saved);
-    }
-    localStorage.setItem("mediTrack_maintenanceData", JSON.stringify(mockMaintenanceData));
-    return mockMaintenanceData;
-}
-
-function saveMaintenanceData(data) {
-    localStorage.setItem("mediTrack_maintenanceData", JSON.stringify(data));
-}
-
-let maintenanceData = loadMaintenanceData();
-
 document.addEventListener("DOMContentLoaded", () => {
-    const tableBody = document.getElementById("maintenanceTableBody");
-    const maintInfo = document.getElementById("maintInfo");
-    const maintModal = document.getElementById("maintenanceModal");
-    const addMaintBtn = document.getElementById("addMaintBtn");
-    const closeMaintModalBtn = document.getElementById("closeMaintModalBtn");
-    const cancelMaintModalBtn = document.getElementById("cancelMaintModalBtn");
-    const maintenanceForm = document.getElementById("maintenanceForm");
-    const maintEquipmentSelect = document.getElementById("maintEquipmentSelect");
+    syncSidebarProfile();
 
-    // Helper Badge Prioritas
-    function getPriorityClass(priority) {
-        if (priority === "Tinggi") return "status-critical";
-        if (priority === "Sedang") return "status-warning";
-        return "status-good";
+    const mockMaintenanceData = [
+        {
+            ticketId: "MNT-1002",
+            equipmentId: "ALT-2026-002",
+            equipmentName: "Ventilator",
+            room: "ICU Ruang 2",
+            issue: "Tekanan udara berkurang saat digunakan.",
+            priority: "Tinggi",
+            status: "Pending",
+            dateAdded: "2026-05-18"
+        },
+        {
+            ticketId: "MNT-1005",
+            equipmentId: "ALT-2026-005",
+            equipmentName: "Pulse Oximeter",
+            room: "UGD",
+            issue: "Layar mati total dan tidak mengisi daya.",
+            priority: "Darurat",
+            status: "Pending",
+            dateAdded: "2026-05-19"
+        }
+    ];
+
+    function getMaintenanceData() {
+        const saved = localStorage.getItem("mediTrack_maintenanceData");
+        if (saved !== null) {
+            try {
+                return JSON.parse(saved);
+            } catch (e) {
+                console.error("Data JSON rusak, memuat data mock...", e);
+            }
+        }
+        localStorage.setItem("mediTrack_maintenanceData", JSON.stringify(mockMaintenanceData));
+        return mockMaintenanceData;
     }
 
-    // Render Tabel Maintenance
-    function renderTable() {
+    function saveMaintenanceData(data) {
+        localStorage.setItem("mediTrack_maintenanceData", JSON.stringify(data));
+    }
+
+    let maintenanceData = getMaintenanceData();
+    const tableBody = document.getElementById("maintenanceTableBody");
+
+    function renderMaintenanceTable() {
         if (!tableBody) return;
+
         tableBody.innerHTML = "";
 
-        if (maintenanceData.length === 0) {
+        // Tampilkan tiket aktif yang valid
+        const activeTickets = maintenanceData.filter(m => m && m.status !== "Selesai");
+
+        if (activeTickets.length === 0) {
             tableBody.innerHTML = `
                 <tr>
                     <td colspan="7" style="text-align: center; padding: 2rem; color: #64748b;">
-                        Belum ada jadwal maintenance yang terdaftar.
+                        Tidak ada tiket pemeliharaan aktif saat ini.
                     </td>
                 </tr>
             `;
-        } else {
-            maintenanceData.forEach((item, index) => {
-                const tr = document.createElement("tr");
-                tr.innerHTML = `
-                    <td><strong>${item.id}</strong></td>
-                    <td>${item.name}</td>
-                    <td>${item.room}</td>
-                    <td>${item.type}</td>
-                    <td><span class="status-badge ${getPriorityClass(item.priority)}">${item.priority}</span></td>
-                    <td><strong style="color: #2563eb; font-size: 13px;">${item.status}</strong></td>
-                    <td style="text-align: center;">
-                        <button class="btn-action delete-maint-btn" data-index="${index}" title="Hapus Jadwal">🗑</button>
-                    </td>
-                `;
-                tableBody.appendChild(tr);
-            });
+            return;
         }
 
-        if (maintInfo) {
-            maintInfo.textContent = `Menampilkan ${maintenanceData.length} jadwal maintenance`;
-        }
+        activeTickets.forEach(item => {
+            // Safe fallback jika properti bernilai undefined
+            const tId = item.ticketId || item.id || "MNT-UNKNOWN";
+            const eName = item.equipmentName || item.name || "Perangkat Medis";
+            const eId = item.equipmentId || item.eqId || "-";
+            const room = item.room || "-";
+            const issue = item.issue || item.description || item.type || "-";
+            const priority = item.priority || "Sedang";
+            const status = item.status || "Pending";
 
-        // Event Hapus Jadwal
-        document.querySelectorAll(".delete-maint-btn").forEach(btn => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td><strong>${tId}</strong></td>
+                <td>${eName} <br><small style="color:#64748b;">${eId}</small></td>
+                <td>${room}</td>
+                <td>${issue}</td>
+                <td><span class="priority-badge priority-${priority.toLowerCase()}">${priority}</span></td>
+                <td><span class="status-badge status-${status.toLowerCase()}">${status}</span></td>
+                <td style="text-align: center;">
+                    <button class="btn-action complete-btn" data-id="${tId}" title="Tandai Selesai" style="padding: 6px 12px; cursor: pointer; background: #16a34a; color: white; border: none; border-radius: 6px; font-weight: bold;">✓ Selesai</button>
+                    <button class="btn-action delete-mnt-btn" data-id="${tId}" title="Hapus Tiket" style="padding: 6px 10px; cursor: pointer; background: #ef4444; color: white; border: none; border-radius: 6px; font-weight: bold; margin-left: 4px;">🗑</button>
+                </td>
+            `;
+            tableBody.appendChild(row);
+        });
+
+        // Event listener Selesai
+        document.querySelectorAll(".complete-btn").forEach(btn => {
             btn.addEventListener("click", (e) => {
-                const idx = e.currentTarget.dataset.index;
-                if (confirm("Apakah Anda yakin ingin menghapus jadwal maintenance ini?")) {
-                    maintenanceData.splice(idx, 1);
-                    saveMaintenanceData(maintenanceData);
-                    renderTable();
+                const targetBtn = e.target.closest(".complete-btn");
+                if (targetBtn) {
+                    completeMaintenanceTicket(targetBtn.dataset.id);
+                }
+            });
+        });
+
+        // Event listener Hapus Paksa
+        document.querySelectorAll(".delete-mnt-btn").forEach(btn => {
+            btn.addEventListener("click", (e) => {
+                const targetBtn = e.target.closest(".delete-mnt-btn");
+                if (targetBtn) {
+                    deleteMaintenanceTicket(targetBtn.dataset.id);
                 }
             });
         });
     }
 
-    // Memuat Opsi Perangkat Medis dari localStorage (Daftar Alat)
-    function populateEquipmentSelect() {
-        const savedEq = localStorage.getItem("mediTrack_equipmentData");
-        const equipmentList = savedEq ? JSON.parse(savedEq) : [];
-        maintEquipmentSelect.innerHTML = "";
+    function completeMaintenanceTicket(ticketId) {
+        if (!confirm(`Tandai perbaikan tiket ${ticketId} sebagai Selesai?`)) return;
 
-        if (equipmentList.length === 0) {
-            maintEquipmentSelect.innerHTML = `<option value="">-- Tidak ada alat tersedia --</option>`;
-            return;
-        }
-
-        equipmentList.forEach(eq => {
-            const opt = document.createElement("option");
-            opt.value = eq.id;
-            opt.dataset.name = eq.name;
-            opt.dataset.room = eq.room;
-            opt.textContent = `${eq.id} - ${eq.name} (${eq.room})`;
-            maintEquipmentSelect.appendChild(opt);
-        });
-    }
-
-    // Modal Control
-    if (addMaintBtn && maintModal) {
-        addMaintBtn.onclick = () => {
-            populateEquipmentSelect();
-            maintenanceForm.reset();
-            maintModal.style.display = "flex";
-        };
-    }
-
-    const closeModal = () => {
-        if (maintModal) maintModal.style.display = "none";
-    };
-
-    if (closeMaintModalBtn) closeMaintModalBtn.onclick = closeModal;
-    if (cancelMaintModalBtn) cancelMaintModalBtn.onclick = closeModal;
-
-    // Form Submit Jadwal Baru
-    if (maintenanceForm) {
-        maintenanceForm.onsubmit = (e) => {
-            e.preventDefault();
-
-            const selectedOption = maintEquipmentSelect.options[maintEquipmentSelect.selectedIndex];
-            if (!selectedOption || !selectedOption.value) {
-                alert("Silakan pilih perangkat medis terlebih dahulu.");
-                return;
-            }
-
-            const newSchedule = {
-                id: selectedOption.value,
-                name: selectedOption.dataset.name,
-                room: selectedOption.dataset.room,
-                type: document.getElementById("maintType").value,
-                priority: document.getElementById("maintPriority").value,
-                status: document.getElementById("maintStatus").value
-            };
-
-            maintenanceData.unshift(newSchedule);
+        const ticket = maintenanceData.find(m => (m.ticketId === ticketId || m.id === ticketId));
+        if (ticket) {
+            ticket.status = "Selesai";
             saveMaintenanceData(maintenanceData);
-            renderTable();
 
-            closeModal();
-        };
-    }
-
-    // Sync profil otomatis dari localStorage
-    function syncSidebarProfile() {
-        const savedProfile = localStorage.getItem("mediTrack_profile");
-        if (!savedProfile) return;
-
-        try {
-            const profile = JSON.parse(savedProfile);
-            const sidebarName = document.getElementById("sidebarName");
-            const sidebarRole = document.getElementById("sidebarRole");
-            const sidebarAvatar = document.getElementById("sidebarAvatar");
-            const topAvatar = document.getElementById("topAvatar");
-
-            if (sidebarName && profile.name) sidebarName.textContent = profile.name;
-            if (sidebarRole && profile.role) sidebarRole.textContent = profile.role;
-
-            if (profile.name) {
-                const initial = profile.name.trim().charAt(0).toUpperCase();
-                if (sidebarAvatar) sidebarAvatar.textContent = initial;
-                if (topAvatar) topAvatar.textContent = initial;
+            // Update status alat di equipmentData
+            const equipmentData = JSON.parse(localStorage.getItem("mediTrack_equipmentData")) || [];
+            const eq = equipmentData.find(e => e.id === (ticket.equipmentId || ticket.eqId));
+            if (eq) {
+                eq.status = "Baik";
+                localStorage.setItem("mediTrack_equipmentData", JSON.stringify(equipmentData));
             }
-        } catch (e) {
-            console.error("Gagal memuat profil:", e);
+
+            maintenanceData = getMaintenanceData();
+            renderMaintenanceTable();
+        } else {
+            // Jika data rusak dan id tidak ditemukan, hapus otomatis
+            deleteMaintenanceTicket(ticketId);
         }
     }
-    renderTable();
+
+    function deleteMaintenanceTicket(ticketId) {
+        maintenanceData = maintenanceData.filter(m => (m.ticketId !== ticketId && m.id !== ticketId && ticketId !== "MNT-UNKNOWN"));
+        saveMaintenanceData(maintenanceData);
+        renderMaintenanceTable();
+    }
+
+    renderMaintenanceTable();
 });
+
+function syncSidebarProfile() {
+    const savedProfile = localStorage.getItem("mediTrack_profile");
+    if (!savedProfile) return;
+
+    try {
+        const profile = JSON.parse(savedProfile);
+        const sidebarName = document.getElementById("sidebarName");
+        const sidebarRole = document.getElementById("sidebarRole");
+        if (sidebarName && profile.name) sidebarName.textContent = profile.name;
+        if (sidebarRole && profile.role) sidebarRole.textContent = profile.role;
+    } catch (e) {
+        console.error("Gagal memuat profil:", e);
+    }
+}

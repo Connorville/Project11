@@ -28,7 +28,6 @@
             <a href="dashboard.html" class="nav-item active"><span>▦</span> Dashboard</a>
             <a href="equipment.html" class="nav-item"><span>▣</span> Daftar Alat</a>
             <a href="maintenance.html" class="nav-item"><span>⚙</span> Maintenance</a>
-            
 
             <p class="nav-label">LAINNYA</p>
             <a href="setting.html" class="nav-item" id="settingsLink"><span>⚙</span> Pengaturan</a>
@@ -55,7 +54,7 @@
             </div>
             <div class="topbar-right">
                 <div class="notification">🔔<span class="notification-dot"></span></div>
-                <div class="top-avatar">A</div>
+                <div class="top-avatar" id="topAvatar">A</div>
             </div>
         </header>
 
@@ -110,39 +109,6 @@
 
 </div>
 
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-    const saved = localStorage.getItem("mediTrack_equipmentData");
-    const data = saved ? JSON.parse(saved) : [];
-
-    const total = data.length;
-    const good = data.filter(i => i.status === "Baik").length;
-    const warn = data.filter(i => i.status === "Perlu Perbaikan").length;
-    const danger = data.filter(i => i.status === "Rusak").length;
-
-    document.getElementById("dashTotal").textContent = total;
-    document.getElementById("dashGood").textContent = good;
-    document.getElementById("dashWarn").textContent = warn;
-    document.getElementById("dashDanger").textContent = danger;
-
-    const tbody = document.getElementById("dashboardTableBody");
-    tbody.innerHTML = "";
-
-    data.slice(0, 5).forEach(item => {
-        let statusClass = "status-good";
-        if (item.status === "Perlu Perbaikan") statusClass = "status-warning";
-        if (item.status === "Rusak") statusClass = "status-critical";
-
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-            <td><strong>${item.id}</strong></td>
-            <td>${item.name}</td>
-            <td>${item.room}</td>
-            <td><span class="status-badge ${statusClass}">${item.status}</span></td>
-        `;
-        tbody.appendChild(tr);
-    });
-});
-</script>
+<script src="../js/dashboard.js"></script>
 </body>
 </html>

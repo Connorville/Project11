@@ -1,10 +1,12 @@
 document.addEventListener("DOMContentLoaded", () => {
+    syncSidebarProfile();
+
     const mockEquipmentData = [
-        { id: "ALT-2026-001", name: "Patient Monitor", category: "Diagnostik", room: "ICU Utama", status: "Baik" },
-        { id: "ALT-2026-002", name: "Ventilator", category: "Pendukung Kehidupan", room: "ICU Ruang 2", status: "Perlu Perbaikan" },
-        { id: "ALT-2026-003", name: "ECG Machine", category: "Diagnostik", room: "Poli Jantung", status: "Baik" },
-        { id: "ALT-2026-004", name: "Infusion Pump", category: "Pendukung Kehidupan", room: "Rawat Inap 3", status: "Baik" },
-        { id: "ALT-2026-005", name: "Pulse Oximeter", category: "Diagnostik", room: "UGD", status: "Rusak" }
+        { id: "ALT-2026-001", name: "Patient Monitor", category: "Monitoring", room: "ICU Utama", status: "Baik" },
+        { id: "ALT-2026-002", name: "Ventilator", category: "Terapi & Bantuan Hidup", room: "ICU Ruang 2", status: "Perlu Perbaikan" },
+        { id: "ALT-2026-003", name: "ECG Machine", category: "Monitoring", room: "Poli Jantung", status: "Baik" },
+        { id: "ALT-2026-004", name: "Infusion Pump", category: "Terapi & Bantuan Hidup", room: "Rawat Inap 3", status: "Baik" },
+        { id: "ALT-2026-005", name: "Pulse Oximeter", category: "Monitoring", room: "UGD", status: "Rusak" }
     ];
 
     function getEquipmentData() {
@@ -16,112 +18,67 @@ document.addEventListener("DOMContentLoaded", () => {
         return mockEquipmentData;
     }
 
-    function saveEquipmentData(data) {
-        localStorage.setItem("mediTrack_equipmentData", JSON.stringify(data));
-    }
-
-    let equipmentData = getEquipmentData();
-    let activeDashId = null;
-
     function renderDashboard() {
-        equipmentData = getEquipmentData();
+        const equipmentData = getEquipmentData();
 
-        // Update Kartu Statistik
-        document.getElementById("dashTotalEq").textContent = equipmentData.length;
-        document.getElementById("dashGoodEq").textContent = equipmentData.filter(i => i.status === "Baik").length;
-        document.getElementById("dashWarnEq").textContent = equipmentData.filter(i => i.status === "Perlu Perbaikan").length;
-        document.getElementById("dashDangerEq").textContent = equipmentData.filter(i => i.status === "Rusak").length;
+        // Update Kartu Statistik Ringkasan
+        const elTotal = document.getElementById("dashTotal") || document.getElementById("dashTotalEq");
+        const elGood = document.getElementById("dashGood") || document.getElementById("dashGoodEq");
+        const elWarn = document.getElementById("dashWarn") || document.getElementById("dashWarnEq");
+        const elDanger = document.getElementById("dashDanger") || document.getElementById("dashDangerEq");
 
-        const table = document.getElementById("dashEquipmentTable");
-        table.innerHTML = "";
+        if (elTotal) elTotal.textContent = equipmentData.length;
+        if (elGood) elGood.textContent = equipmentData.filter(i => i.status === "Baik").length;
+        if (elWarn) elWarn.textContent = equipmentData.filter(i => i.status === "Perlu Perbaikan").length;
+        if (elDanger) elDanger.textContent = equipmentData.filter(i => i.status === "Rusak").length;
 
-        // Menampilkan 5 data paling baru
+        // Render Tabel Aktivitas Ringkas
+        const tableBody = document.getElementById("dashboardTableBody") || document.getElementById("dashEquipmentTable");
+        if (!tableBody) return;
+        
+        tableBody.innerHTML = "";
+
         const recentItems = [...equipmentData].reverse().slice(0, 5);
 
         recentItems.forEach(item => {
             let statusClass = "status-good";
             if (item.status === "Perlu Perbaikan") statusClass = "status-warning";
-            if (item.status === "Rusak") statusClass = "status-danger";
+            if (item.status === "Rusak") statusClass = "status-critical";
 
             const row = document.createElement("tr");
             row.innerHTML = `
-                <td>${item.id}</td>
-                <td><strong>${item.name}</strong></td>
+                <td><strong>${item.id}</strong></td>
+                <td>${item.name}</td>
                 <td>${item.room}</td>
-                <td><span class="status ${statusClass}">${item.status}</span></td>
-                <td>
-                    <button class="btn-action dash-view-btn" data-id="${item.id}">Detail</button>
-                </td>
+                <td><span class="status-badge ${statusClass}">${item.status}</span></td>
             `;
-            table.appendChild(row);
-        });
-
-        document.querySelectorAll(".dash-view-btn").forEach(btn => {
-            btn.addEventListener("click", (e) => openDashModal(e.target.dataset.id));
+            tableBody.appendChild(row);
         });
     }
-
-    // Modal Detail Ringkas di Dashboard
-    const modal = document.getElementById("dashDetailModal");
-    function openDashModal(id) {
-        const item = equipmentData.find(eq => eq.id === id);
-        if (!item) return;
-
-        activeDashId = id;
-        document.getElementById("dDashId").textContent = item.id;
-        document.getElementById("dDashName").textContent = item.name;
-        document.getElementById("dDashRoom").textContent = item.room;
-        
-        const st = document.getElementById("dDashStatus");
-        st.textContent = item.status;
-        st.className = "status " + (item.status === "Baik" ? "status-good" : item.status === "Perlu Perbaikan" ? "status-warning" : "status-danger");
-
-        modal.style.display = "flex";
-    }
-
-    document.getElementById("closeDashDetail").onclick = () => modal.style.display = "none";
-    document.getElementById("cancelDashDetail").onclick = () => modal.style.display = "none";
-
-    document.getElementById("dashDeleteOneBtn").onclick = () => {
-        if (activeDashId) {
-            equipmentData = equipmentData.filter(i => i.id !== activeDashId);
-            saveEquipmentData(equipmentData);
-            renderDashboard();
-            modal.style.display = "none";
-        }
-    };
-
-    // Sync profil otomatis dari localStorage
-    function syncSidebarProfile() {
-        const savedProfile = localStorage.getItem("mediTrack_profile");
-        if (!savedProfile) return;
-
-        try {
-            const profile = JSON.parse(savedProfile);
-            const sidebarName = document.getElementById("sidebarName");
-            const sidebarRole = document.getElementById("sidebarRole");
-            const sidebarAvatar = document.getElementById("sidebarAvatar");
-            const topAvatar = document.getElementById("topAvatar");
-
-            if (sidebarName && profile.name) sidebarName.textContent = profile.name;
-            if (sidebarRole && profile.role) sidebarRole.textContent = profile.role;
-
-            if (profile.name) {
-                const initial = profile.name.trim().charAt(0).toUpperCase();
-                if (sidebarAvatar) sidebarAvatar.textContent = initial;
-                if (topAvatar) topAvatar.textContent = initial;
-            }
-        } catch (e) {
-            console.error("Gagal memuat profil:", e);
-        }
-    }
-
-    // Pastikan dipanggil DI DALAM event DOMContentLoaded:
-    document.addEventListener("DOMContentLoaded", () => {
-    syncSidebarProfile(); // <-- Panggil di baris pertama
-    
-    // ... kode halaman lainnya ...
-    });
 
     renderDashboard();
 });
+
+function syncSidebarProfile() {
+    const savedProfile = localStorage.getItem("mediTrack_profile");
+    if (!savedProfile) return;
+
+    try {
+        const profile = JSON.parse(savedProfile);
+        const sidebarName = document.getElementById("sidebarName");
+        const sidebarRole = document.getElementById("sidebarRole");
+        const sidebarAvatar = document.getElementById("sidebarAvatar");
+        const topAvatar = document.getElementById("topAvatar");
+
+        if (sidebarName && profile.name) sidebarName.textContent = profile.name;
+        if (sidebarRole && profile.role) sidebarRole.textContent = profile.role;
+
+        if (profile.name) {
+            const initial = profile.name.trim().charAt(0).toUpperCase();
+            if (sidebarAvatar) sidebarAvatar.textContent = initial;
+            if (topAvatar) topAvatar.textContent = initial;
+        }
+    } catch (e) {
+        console.error("Gagal memuat profil:", e);
+    }
+}
