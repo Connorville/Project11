@@ -12,7 +12,6 @@
 <body>
 
 <div class="app-layout">
-
     <!-- SIDEBAR -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
@@ -30,7 +29,7 @@
             <a href="maintenance.html" class="nav-item active"><span>⚙</span> Maintenance</a>
 
             <p class="nav-label">LAINNYA</p>
-            <a href="setting.html" class="nav-item" id="settingsLink"><span>⚙</span> Pengaturan</a>
+            <a href="setting.html" class="nav-item"><span>⚙</span> Pengaturan</a>
         </nav>
 
         <div class="sidebar-footer">
@@ -44,7 +43,6 @@
 
     <!-- MAIN CONTENT -->
     <main class="main-content">
-
         <!-- TOPBAR -->
         <header class="topbar">
             <button class="menu-button" id="menuButton">☰</button>
@@ -54,95 +52,69 @@
             </div>
             <div class="topbar-right">
                 <div class="notification">🔔<span class="notification-dot"></span></div>
-                <div class="top-avatar">A</div>
+                <div class="top-avatar" id="topAvatar">A</div>
             </div>
         </header>
 
         <!-- CONTENT -->
         <section class="content">
-
-            <div class="action-bar" style="justify-content: flex-end;">
-                <button class="btn btn-primary" id="addMaintBtn">+ Buat Jadwal Baru</button>
+            <div style="display: flex; justify-content: flex-end; margin-bottom: 16px;">
+                <button id="addMaintenanceBtn" class="btn-primary" style="padding: 10px 20px; background: #2563eb; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer;">+ Buat Jadwal Baru</button>
             </div>
 
-            <!-- MAINTENANCE TABLE CARD -->
             <div class="card table-card">
                 <div class="table-responsive">
                     <table class="data-table">
                         <thead>
                             <tr>
-                                <th>ID Alat</th>
+                                <th>ID Tiket</th>
                                 <th>Nama Perangkat</th>
                                 <th>Ruangan</th>
-                                <th>Jenis Perbaikan</th>
+                                <th>Deskripsi / Keluhan</th>
                                 <th>Prioritas</th>
                                 <th>Status Maintenance</th>
                                 <th style="text-align: center;">Aksi</th>
                             </tr>
                         </thead>
                         <tbody id="maintenanceTableBody">
-                            <!-- Di-render via JS -->
+                            <!-- Di-render via JavaScript -->
                         </tbody>
                     </table>
                 </div>
-                <div class="table-footer">
-                    <span class="table-info" id="maintInfo">Menampilkan 0 jadwal</span>
-                </div>
             </div>
-
         </section>
-
     </main>
-
 </div>
 
-<!-- MODAL BUAT JADWAL MAINTENANCE BARU -->
-<div class="modal-overlay" id="maintenanceModal" style="display: none;">
-    <div class="modal-box">
-        <div class="modal-header">
-            <h3>Buat Jadwal Maintenance</h3>
-            <button class="close-btn" id="closeMaintModalBtn">&times;</button>
+<!-- MODAL TAMBAH JADWAL MAINTENANCE MANUAL -->
+<div id="maintenanceModal" class="modal-backdrop" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+    <div class="modal-card" style="background: white; border-radius: 12px; width: 100%; max-width: 480px; padding: 24px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <h3 style="margin: 0; font-size: 18px;">🛠️ Tambah Jadwal Maintenance</h3>
+            <button id="closeMntModalBtn" style="background: none; border: none; font-size: 20px; cursor: pointer;">&times;</button>
         </div>
-        <form id="maintenanceForm">
-            <div class="form-group">
-                <label for="maintEquipmentSelect">Pilih Perangkat Medis</label>
-                <select id="maintEquipmentSelect" required>
-                    <!-- Opsi alat dari localStorage di-render via JS -->
+        <form id="addMaintenanceForm">
+            <div style="margin-bottom: 12px;">
+                <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px;">Pilih Perangkat Medis</label>
+                <select id="selectEquipment" required style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 6px; outline: none;">
+                    <!-- Opsi alat di-render otomatis via JS -->
                 </select>
             </div>
-
-            <div class="form-group">
-                <label for="maintType">Jenis Perbaikan / Pemeliharaan</label>
-                <select id="maintType" required>
-                    <option value="Kalibrasi Rutin">Kalibrasi Rutin</option>
-                    <option value="Servis Berkala">Servis Berkala</option>
-                    <option value="Perbaikan Total">Perbaikan Total</option>
-                    <option value="Pemeriksaan Komponen">Pemeriksaan Komponen</option>
+            <div style="margin-bottom: 12px;">
+                <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px;">Tingkat Prioritas</label>
+                <select id="inputPriority" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 6px; outline: none;">
+                    <option value="Sedang">Sedang</option>
+                    <option value="Tinggi">Tinggi</option>
+                    <option value="Darurat">Darurat</option>
                 </select>
             </div>
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="maintPriority">Prioritas</label>
-                    <select id="maintPriority" required>
-                        <option value="Sedang">Sedang</option>
-                        <option value="Tinggi">Tinggi</option>
-                        <option value="Rendah">Rendah</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="maintStatus">Status Pengerjaan</label>
-                    <select id="maintStatus" required>
-                        <option value="Menunggu Teknisi">Menunggu Teknisi</option>
-                        <option value="Dalam Proses">Dalam Proses</option>
-                        <option value="Selesai">Selesai</option>
-                    </select>
-                </div>
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px;">Deskripsi / Keluhan Perbaikan</label>
+                <textarea id="inputIssue" required rows="3" placeholder="Contoh: Kalibrasi berkala / pembersihan unit" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 6px; outline: none; resize: vertical;"></textarea>
             </div>
-
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" id="cancelMaintModalBtn">Batal</button>
-                <button type="submit" class="btn btn-primary">Simpan Jadwal</button>
+            <div style="display: flex; justify-content: flex-end; gap: 8px;">
+                <button type="button" id="cancelMntModalBtn" style="padding: 8px 16px; border: 1px solid var(--border-color); background: white; border-radius: 6px; cursor: pointer;">Batal</button>
+                <button type="submit" style="padding: 8px 16px; background: #2563eb; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer;">Simpan Jadwal</button>
             </div>
         </form>
     </div>

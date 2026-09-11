@@ -44,12 +44,19 @@ document.addEventListener("DOMContentLoaded", () => {
     let maintenanceData = getMaintenanceData();
     const tableBody = document.getElementById("maintenanceTableBody");
 
+    // Modal Elements
+    const mntModal = document.getElementById("maintenanceModal");
+    const addMntBtn = document.getElementById("addMaintenanceBtn");
+    const closeMntBtn = document.getElementById("closeMntModalBtn");
+    const cancelMntBtn = document.getElementById("cancelMntModalBtn");
+    const mntForm = document.getElementById("addMaintenanceForm");
+    const selectEquipment = document.getElementById("selectEquipment");
+
     function renderMaintenanceTable() {
         if (!tableBody) return;
 
         tableBody.innerHTML = "";
 
-        // Tampilkan tiket aktif yang valid
         const activeTickets = maintenanceData.filter(m => m && m.status !== "Selesai");
 
         if (activeTickets.length === 0) {
@@ -64,7 +71,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         activeTickets.forEach(item => {
-            // Safe fallback jika properti bernilai undefined
             const tId = item.ticketId || item.id || "MNT-UNKNOWN";
             const eName = item.equipmentName || item.name || "Perangkat Medis";
             const eId = item.equipmentId || item.eqId || "-";
@@ -99,7 +105,7 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         });
 
-        // Event listener Hapus Paksa
+        // Event listener Hapus
         document.querySelectorAll(".delete-mnt-btn").forEach(btn => {
             btn.addEventListener("click", (e) => {
                 const targetBtn = e.target.closest(".delete-mnt-btn");
@@ -118,7 +124,7 @@ document.addEventListener("DOMContentLoaded", () => {
             ticket.status = "Selesai";
             saveMaintenanceData(maintenanceData);
 
-            // Update status alat di equipmentData
+            // Update status alat di equipmentData menjadi Baik
             const equipmentData = JSON.parse(localStorage.getItem("mediTrack_equipmentData")) || [];
             const eq = equipmentData.find(e => e.id === (ticket.equipmentId || ticket.eqId));
             if (eq) {
@@ -129,7 +135,6 @@ document.addEventListener("DOMContentLoaded", () => {
             maintenanceData = getMaintenanceData();
             renderMaintenanceTable();
         } else {
-            // Jika data rusak dan id tidak ditemukan, hapus otomatis
             deleteMaintenanceTicket(ticketId);
         }
     }
@@ -138,6 +143,79 @@ document.addEventListener("DOMContentLoaded", () => {
         maintenanceData = maintenanceData.filter(m => (m.ticketId !== ticketId && m.id !== ticketId && ticketId !== "MNT-UNKNOWN"));
         saveMaintenanceData(maintenanceData);
         renderMaintenanceTable();
+    }
+
+    // HANDLER BUKA MODAL MAINTENANCE
+    if (addMntBtn && mntModal) {
+        addMntBtn.onclick = () => {
+            populateEquipmentOptions();
+            if (mntForm) mntForm.reset();
+            mntModal.style.display = "flex";
+        };
+    }
+
+    function populateEquipmentOptions() {
+        if (!selectEquipment) return;
+        const equipmentData = JSON.parse(localStorage.getItem("mediTrack_equipmentData")) || [];
+        selectEquipment.innerHTML = "";
+
+        if (equipmentData.length === 0) {
+            selectEquipment.innerHTML = `<option value="">Tidak ada alat tersedia</option>`;
+            return;
+        }
+
+        equipmentData.forEach(eq => {
+            const opt = document.createElement("option");
+            opt.value = eq.id;
+            opt.textContent = `${eq.name} (${eq.id}) - Ruang: ${eq.room}`;
+            selectEquipment.appendChild(opt);
+        });
+    }
+
+    const closeModal = () => { if (mntModal) mntModal.style.display = "none"; };
+    if (closeMntBtn) closeMntBtn.onclick = closeModal;
+    if (cancelMntBtn) cancelMntBtn.onclick = closeModal;
+
+    // HANDLER SUBMIT FORM MAINTENANCE
+    if (mntForm) {
+        mntForm.onsubmit = (e) => {
+            e.preventDefault();
+
+            const eqId = selectEquipment.value;
+            const equipmentData = JSON.parse(localStorage.getItem("mediTrack_equipmentData")) || [];
+            const selectedEq = equipmentData.find(e => e.id === eqId);
+
+            if (!selectedEq) {
+                alert("Silakan pilih alat yang valid.");
+                return;
+            }
+
+            const priority = document.getElementById("inputPriority").value;
+            const issue = document.getElementById("inputIssue").value;
+
+            // Update status alat di daftar alat menjadi Perlu Perbaikan jika tadinya Baik
+            if (selectedEq.status === "Baik") {
+                selectedEq.status = priority === "Darurat" ? "Rusak" : "Perlu Perbaikan";
+                localStorage.setItem("mediTrack_equipmentData", JSON.stringify(equipmentData));
+            }
+
+            const newTicket = {
+                ticketId: `MNT-${Math.floor(1000 + Math.random() * 9000)}`,
+                equipmentId: selectedEq.id,
+                equipmentName: selectedEq.name,
+                room: selectedEq.room,
+                issue: issue,
+                priority: priority,
+                status: "Pending",
+                dateAdded: new Date().toISOString().split('T')[0]
+            };
+
+            maintenanceData.unshift(newTicket);
+            saveMaintenanceData(maintenanceData);
+            renderMaintenanceTable();
+
+            closeModal();
+        };
     }
 
     renderMaintenanceTable();
